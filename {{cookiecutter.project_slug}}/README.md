@@ -1,10 +1,13 @@
 
-# Welcome to your CDK Python project!
+# Welcome to your Python project!
 
-This project is set up like Python project using poetry package manager. 
+This project is set up Python project with dev tooling pre-configured
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
-
+* black
+* flake8
+* isort
+* mypy
+* VS Code support
 
 ## Setup
 ```
@@ -21,15 +24,4 @@ $ poetry shell
 # run unit tests
 pytest
 
-# use cdk to deploy infrastructure
-# ensure your AWS credentials are set, then
-cdk synth
-cdk deploy
-
 ```
-
-## push to Github
-```
-poetry export -o requirements.txt
-# push to feature branches and develop branch will trigger pipeline run
-git push ...

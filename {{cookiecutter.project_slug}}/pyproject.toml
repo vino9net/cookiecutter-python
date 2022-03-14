@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "{{ cookiecutter.project_name }}"
 version = "0.1.0"
-description = "AWS infrastructure stack written in AWS CDK for Python"
+description = "Cookiecutter template for generic Python 3 project with tooling configuration for testing, linting and IDE support"
 authors = ["Li Lin <guru.lin@gmail.com>"]
 license = "MIT"
 
@@ -9,19 +9,9 @@ license = "MIT"
 # not just dependencies requied for lambda runtime
 [tool.poetry.dependencies]
 python = "^3.9"
-boto3 = "1.21.4"
-aws-lambda-powertools = "^1.24.2"
-aws-cdk-lib = "^2.13.0"
-constructs = "10.*"
 pytest = "^6.2.5"
 pytest-mock = "^3.5.1"
 pytest-cov = "^3.0.0"
-{% if cookiecutter.use_lambda == 'y' -%}
-"aws-solutions-constructs.aws-apigateway-lambda" = "^2.3.0"
-{%- endif %}
-# this is used by tests/integration/conftest.py to create IAM auth fixtures
-# if IAM auth is not required, it can be removed
-requests-aws4auth = "^1.1.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -43,26 +33,21 @@ pre-commit = "^2.17.0"
 mypy = "^0.931"
 types-setuptools = "^57.4.8"
 types-toml = "^0.10.3"
-boto3-stubs = "1.21.4"
 
 [tool.isort]
 profile = "black"
 line_length = 120
-src_paths = ["runtime", "infrastructure", "tests"]
+src_paths = ["."]
 
 [tool.black]
 line-length = 120
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-# addopts = "--cov=runtime --cov-report html --cov-report xml"
 testpaths = [
     "tests",
 ]
 
 [tool.coverage.run]
-source = ["runtime"]
-omit = ["tests/*", "infrastructure/*"]
-
-[tool.coverage.html]
-directory = "test_report"
+source = ["."]
+omit = ["tests/*"]
