@@ -37,11 +37,3 @@ pytest -v
 # hack away!
 
 ```
-
-[A Github action pipeline]({{cookiecutter.pkg_name}}/.github/workflows/pipeline.yaml) is also generated. The following secrets are required for the pipeline to work:
-* AWS_ACCESS_KEY_ID
-* AWS_SECRET_ACCESS_KEY
-
-### TODO:
-1. add GitLab pipeline
-2. make cdk and other dependecnies version configurable
