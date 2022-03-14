@@ -1,13 +1,8 @@
-## Cookiecutter template for Python CDK Stack project
+## Cookiecutter template for Python3 project
 
-This is a cookiecutter template for AWS infrastructure stack project using AWS CDK for Python.
+This is a cookiecutter template for generic Python3 project with preconfigured linting tools.
 
 The [poetry](https://python-poetry.org/) package manager should exist in PATH in order to use this template.
-
-The main dependecnies for the generated project are:
-1. [AWS Cloud Development Kit](https://aws.amazon.com/cdk/) for Python
-2. [AWS Lambda Powertools for Python](https://awslabs.github.io/aws-lambda-powertools-python/latest/)
-3. pytest
 
 The following linting tools are also required and preconfigured to use with the generated project:
 * flake8
@@ -24,7 +19,7 @@ To use the template, please install cookiecutter on your computer by following [
 ```
 
 # generate the template, enter project name when prompted
-cookiecutter gh:vino9org/cookiecutter-python-cdk-stack
+cookiecutter gh:vino9org/cookiecutter-python
 
 # init venv and install dependencies
 cd <project_path>
