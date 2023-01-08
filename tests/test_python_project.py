@@ -27,6 +27,7 @@ def test_default_project(cookies):
 
     assert result.project_path.name == "my-default-project"
     assert result.project_path.is_dir()
+    assert (result.project_path / ".git/HEAD").is_file()
 
     print(f"test project generated {result.project_path}")
 
