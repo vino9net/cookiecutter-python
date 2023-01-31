@@ -1,6 +1,5 @@
 import json
 import os
-import shlex
 import shutil
 import subprocess
 
@@ -9,6 +8,11 @@ context = json.loads(
 {{ cookiecutter | jsonify }}
 """
 )
+
+use_github_action = context["use_github_action"] == "y"
+
+if not use_github_action:
+    shutil.rmtree(".github")
 
 # create a git repo, everybody needs this, right?
 subprocess.call(["git", "init"])
