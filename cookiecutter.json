@@ -4,5 +4,8 @@
   "pkg_name": "{{ cookiecutter.project_slug|replace('-', '_') }}",
   "project_short_description": "Generic Python3 project",
   "use_github_action": ["n", "y"],
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "_copy_without_render": [
+    ".github/workflows/build_n_push.yaml"
+  ]
 }
