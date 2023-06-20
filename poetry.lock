@@ -228,21 +228,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "flake8-isort"
-version = "4.2.0"
-description = "flake8 plugin that integrates isort ."
-category = "dev"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-flake8 = ">=3.2.1,<6"
-isort = ">=4.3.5,<6"
-
-[package.extras]
-test = ["pytest-cov"]
-
-[[package]]
 name = "flake8-variables-names"
 version = "0.0.5"
 description = "A flake8 extension that helps to make more readable variables names"
@@ -276,20 +261,6 @@ description = "brain-dead simple config-ini parsing"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
-
-[[package]]
-name = "isort"
-version = "5.12.0"
-description = "A Python utility / library to sort Python imports."
-category = "dev"
-optional = false
-python-versions = ">=3.8.0"
-
-[package.extras]
-colors = ["colorama (>=0.4.3)"]
-requirements-deprecated-finder = ["pip-api", "pipreqs"]
-pipfile-deprecated-finder = ["pip-shims (>=0.5.2)", "pipreqs", "requirementslib"]
-plugins = ["setuptools"]
 
 [[package]]
 name = "jinja2"
@@ -619,7 +590,7 @@ testing = ["coverage (>=6.2)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "6b75ac5dd98b43df570ea1cd148230209ce1d94294ecc783810ad25e305f5361"
+content-hash = "a3c0b7474445af41577e006b548357abe60832ce42b6134d10df4ab8fccbbc8f"
 
 [metadata.files]
 arrow = []
@@ -648,12 +619,10 @@ flake8-builtins = []
 flake8-comprehensions = []
 flake8-debugger = []
 flake8-fixme = []
-flake8-isort = []
 flake8-variables-names = []
 identify = []
 idna = []
 iniconfig = []
-isort = []
 jinja2 = [
     {file = "Jinja2-3.1.2-py3-none-any.whl", hash = "sha256:6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61"},
     {file = "Jinja2-3.1.2.tar.gz", hash = "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"},
