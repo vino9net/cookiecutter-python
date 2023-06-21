@@ -4,13 +4,16 @@
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true,
     "python.linting.lintOnSave": true,
-    "python.linting.ignorePatterns": [".venv/**/*.py"],
+    "python.linting.ignorePatterns": [
+        ".venv/**/*.py"
+    ],
     "python.testing.pytestEnabled": true,
     "python.envFile": "${workspaceFolder}/.env",
     "[python]": {
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
             "source.organizeImports": true
-        }
+        },
+        "editor.defaultFormatter": "ms-python.black-formatter"
     }
 }
