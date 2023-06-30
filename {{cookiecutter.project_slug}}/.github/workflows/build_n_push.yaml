@@ -1,10 +1,9 @@
-# name: build and publish a multi-arch (amd64 and arm64) container image
-# and publish to Github container registry linked to this repo
-
 on:
   push:
     branches:
     - develop
+    tags:
+    - v[0-9].*
 
   workflow_dispatch:
 
@@ -35,6 +34,8 @@ jobs:
     - name: Unit tests
       run: |
         pytest -v -s
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: set image metadata
       id: meta
@@ -42,10 +43,12 @@ jobs:
       with:
         images: ghcr.io/${{ github.repository }}
         tags: |
-          type=ref,event=tag
+          type=ref,suffix=-{{sha}},event=tag
           type=raw,value=develop-{{date 'YYYYMMDD-HHmmss' tz='Asia/Singapore'}}-{{sha}},enable=${{ github.ref == format('refs/heads/{0}', 'develop') }}
         flavor: |
           latest=false
+        labels: |
+          org.opencontainers.image.source https://github.com/{{ ${{ github.repository }}
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2

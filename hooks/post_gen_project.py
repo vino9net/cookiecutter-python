@@ -9,10 +9,10 @@ context = json.loads(
 """
 )
 
-use_github_action = context["use_github_action"] == "y"
-
-if not use_github_action:
+if context["generate_dockerfile"] != "y":
     shutil.rmtree(".github")
+    os.unlink("Dockerfile")
+    os.unlink(".dockerignore")
 
 # create a git repo, everybody needs this, right?
 subprocess.call(["git", "init"])
