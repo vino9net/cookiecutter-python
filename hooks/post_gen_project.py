@@ -38,6 +38,7 @@ else:
 # create a git repo, everybody needs this, right?
 print("Initializing git repo...")
 subprocess.call(shlex.split("git init"))
+subprocess.call(shlex.split("git checkout -b develop"))
 subprocess.call(shlex.split("git add .gitignore .flake8 .dockerignore"))
 subprocess.call(shlex.split("git add *"))
 subprocess.call(
