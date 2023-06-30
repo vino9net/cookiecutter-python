@@ -27,7 +27,9 @@ else:
     Github workflow has been generated under .github/workflows directory. To create the corresponding
     Github repository, please run the following command:
 
+        cd {{ cookiecutter.project_slug }}
         gh repo create {{ cookiecutter.project_slug }} --source=. --public
+        git push -u origin develop
 
     Please ensure the workflow permission is seting to 'Read and write permissions' to enable pushing
     container images to Github container registry.
