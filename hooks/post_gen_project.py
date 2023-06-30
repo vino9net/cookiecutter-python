@@ -13,6 +13,19 @@ if context["generate_dockerfile"] != "y":
     shutil.rmtree(".github")
     os.unlink("Dockerfile")
     os.unlink(".dockerignore")
+else:
+    print(
+        """
+    Github workflow has been generated under .github/workflows directory. To create the corresponding
+    Github repository, please run the following command:
+
+    gh repo create <repo_name> --source=. --public
+
+    Please ensure the workflow permission is seting to 'Read and write permissions' to enable pushing
+    container images to Github container registry.
+
+    """
+    )
 
 # create a git repo, everybody needs this, right?
 subprocess.call(["git", "init"])
