@@ -9,28 +9,24 @@ context = json.loads(
 """
 )
 
-print("===context===")
-print(context)
-
-slug = context["project_slug"]
 dockerfile_option = context["dockerfile_option"]
 
-if dockerfile_option == "3":
+if dockerfile_option == "None":
     # none
     shutil.rmtree(".github")
     os.unlink("Dockerfile")
     os.unlink(".dockerignore")
-elif dockerfile_option == "2":
+elif dockerfile_option == "Dockerfile only":
     # dockerfile, no github workflow
     shutil.rmtree(".github")
 else:
     # dockerfile and github workflow
     print(
-        f"""
+        """
     Github workflow has been generated under .github/workflows directory. To create the corresponding
     Github repository, please run the following command:
 
-        gh repo create { slug } --source=. --public
+        gh repo create {{ cookiecutter.project_slug }} --source=. --public
 
     Please ensure the workflow permission is seting to 'Read and write permissions' to enable pushing
     container images to Github container registry.
