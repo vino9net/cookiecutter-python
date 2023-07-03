@@ -9,7 +9,7 @@
       "poetry shell"
     ],
     "scripts": {
-      "test": "poetry run pytest -s -v"
+      "test": "poetry run pytest -v"
     }
   }
 }
