@@ -1,5 +1,5 @@
 
-# Welcome to your Python project!
+# Welcome to your Python project
 
 This project is set up Python project with dev tooling pre-configured
 
@@ -10,17 +10,31 @@ This project is set up Python project with dev tooling pre-configured
 * VS Code support
 
 ## Setup
-```
-# create virtualenv
-$ poetry shell
 
+The easiest way to get started is probably use [Jetpack.io devbox](https://www.jetpack.io/devbox). Install devbox first, then
+
+```shell
+devbox shell
+
+# you should ready to go
+
+```
+
+The more traditional way is to install python 3.10 and [poetry](https://python-poetry.org/), then
+
+```shell
+
+# create virtualenv
+poetry shell
 # install dependencies
-(.venv)$ poetry install
+poetry install
 
 ```
 
 ## Develop the code for the stack
-```
+
+```shell
+
 # run unit tests
 pytest
 
