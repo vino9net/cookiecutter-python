@@ -6,8 +6,7 @@
   "shell": {
     "init_hook": [
       "poetry install",
-      "poetry shell",
-      "poetry run pre-commit install"
+      "poetry shell"
     ],
     "scripts": {
       "test": "poetry run pytest -s -v"
