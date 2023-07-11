@@ -8,6 +8,7 @@
     },
     "python@3.10": {
       "last_modified": "2022-05-01T01:43:46Z",
+      "plugin_version": "0.0.1",
       "resolved": "github:NixOS/nixpkgs/b283b64580d1872333a99af2b4cef91bb84580cf#python310",
       "version": "3.10.4"
     }

@@ -8,7 +8,7 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.10"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "6.2.5"
 pytest-cookies = "^0.6.1"
 # formatting, linting
@@ -21,7 +21,7 @@ flake8-debugger = "^4.1.2"
 flake8-fixme = "^1.1.1"
 flake8-variables-names = "^0.0.5"
 pre-commit = "^2.19.0"
-mypy = "^0.961"
+mypy = "1.4.1"
 types-setuptools = "^57.4.8"
 types-toml = "^0.10.3"
 
