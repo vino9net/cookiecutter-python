@@ -6,7 +6,7 @@ authors = ["Li Lin <guru.lin@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "6.2.5"
