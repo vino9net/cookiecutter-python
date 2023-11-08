@@ -10,13 +10,45 @@ def run_pytest_in_generated_project(project_path):
 
     current_path = os.getcwd()
 
-    os.chdir(project_path)
-    subprocess.call(["poetry", "install"])
-    retcode = subprocess.call(shlex.split("poetry run pytest -v"))
+    try:
+        os.chdir(project_path)
+        subprocess.call(["poetry", "install"])
+        assert subprocess.call(shlex.split("poetry run pytest -v")) == 0
+    finally:
+        os.chdir(current_path)
 
-    os.chdir(current_path)
 
-    return retcode
+def run_flake8_in_generated_project(project_path):
+    if not os.path.isdir(project_path):
+        return
+
+    current_path = os.getcwd()
+
+    try:
+        os.chdir(project_path)
+        subprocess.call(["poetry", "install"])
+        assert subprocess.call(shlex.split("poetry run flake8 -v")) == 0
+    finally:
+        os.chdir(current_path)
+
+
+def run_precommit_in_generated_project(project_path):
+    if not os.path.isdir(project_path):
+        return
+
+    current_path = os.getcwd()
+
+    try:
+        os.chdir(project_path)
+        subprocess.call(["poetry", "install"])
+        assert subprocess.call(shlex.split("poetry run pre-commit install")) == 0
+        with open("a.py", "w") as f:
+            f.write("# just some text\n")
+            f.write("some_var = 0\n")
+        assert subprocess.call(shlex.split("git add a.py")) == 0
+        assert subprocess.call(shlex.split("poetry run pre-commit run")) == 0
+    finally:
+        os.chdir(current_path)
 
 
 def test_default_project(cookies):
@@ -31,4 +63,6 @@ def test_default_project(cookies):
 
     print(f"test project generated {result.project_path}")
 
-    assert run_pytest_in_generated_project(result.project_path) == 0
+    run_pytest_in_generated_project(result.project_path)
+    run_flake8_in_generated_project(result.project_path)
+    run_precommit_in_generated_project(result.project_path)
