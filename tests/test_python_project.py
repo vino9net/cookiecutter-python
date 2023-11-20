@@ -27,7 +27,14 @@ def run_flake8_in_generated_project(project_path):
     try:
         os.chdir(project_path)
         subprocess.call(["poetry", "install"])
-        assert subprocess.call(shlex.split("poetry run flake8 -v")) == 0
+        # run flake8 but ignore auto reformat of black (BLK100)
+        # and blank lines related (E302, E303)
+        assert (
+            subprocess.call(
+                shlex.split("poetry run flake8 -v --ignore BLK100,E302,E303")
+            )
+            == 0
+        )
     finally:
         os.chdir(current_path)
 

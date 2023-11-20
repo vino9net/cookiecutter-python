@@ -8,7 +8,7 @@ license = "MIT"
 # this section contains all dependencies required to run unit and integration tests
 # not just dependencies requied for lambda runtime
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.12"
 python-dotenv = "^1.0.0"
 {% if "pandas" in cookiecutter.extra_packages %}
 pandas = "1.5.3"

@@ -77,6 +77,8 @@ print(
     """
 
     poetry install
+    poettry export -f requirements.txt -o requirements.txt --without-hashes
+    poettry export -f requirements.txt --group dev -o requirements-dev.txt --without-hashes
     poetry shell
 
     # under poetry, run the following commands to install linting tools
