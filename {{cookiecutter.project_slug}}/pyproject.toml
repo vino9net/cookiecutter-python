@@ -10,6 +10,10 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.11"
 python-dotenv = "^1.0.0"
+{% if "pandas" in cookiecutter.extra_packages %}
+pandas = "1.5.3"
+{% endif %}
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -33,6 +37,9 @@ types-setuptools = "^57.4.8"
 types-toml = "^0.10.3"
 isort = "^5.12.0"
 pre-commit = "^3.3.3"
+{% if "pandas" in cookiecutter.extra_packages %}
+pandas-stubs="1.5.3.230304"
+{% endif %}
 
 [tool.black]
 line-length = 120

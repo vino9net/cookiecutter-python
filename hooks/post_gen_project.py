@@ -55,14 +55,35 @@ print(
 # To start working on the project,
 
 cd ~/{relpath}
-poetry install
-poetry run pre-commit install
-poetry run isort **/*.py
-poetry run black .
-poetry shell
-
-
-#    Hack away!
 
 """
+)
+
+if "pandas" in context["extra_packages"]:
+    print(
+        """
+    #
+    # If you use pandas, please check pyproject.toml to make sure the version
+    # of package and stubs are the correct version you want to use.
+    # Search PyPI for the correct version of the packages.
+
+    # If you use devbox, please check devbox.json to make
+    # sure the pandas package there matches the version in pyproject.toml.
+    #
+    """
+    )
+
+print(
+    """
+
+    poetry install
+    poetry shell
+
+    # under poetry, run the following commands to install linting tools
+    pre-commit install
+    flake8
+
+    # Hack away!
+
+    """
 )

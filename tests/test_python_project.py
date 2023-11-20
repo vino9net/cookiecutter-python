@@ -66,3 +66,20 @@ def test_default_project(cookies):
     run_pytest_in_generated_project(result.project_path)
     run_flake8_in_generated_project(result.project_path)
     run_precommit_in_generated_project(result.project_path)
+
+
+def test_project_with_extra_pacakges(cookies):
+    result = cookies.bake(extra_context={"project_name": "My Data Project"})
+
+    assert result.exit_code == 0
+    assert result.exception is None
+
+    assert result.project_path.name == "my-data-project"
+    assert result.project_path.is_dir()
+    assert (result.project_path / ".git/HEAD").is_file()
+
+    print(f"\ntest project generated {result.project_path}")
+
+    run_pytest_in_generated_project(result.project_path)
+    run_flake8_in_generated_project(result.project_path)
+    run_precommit_in_generated_project(result.project_path)
