@@ -52,11 +52,11 @@ home = os.path.expanduser("~")
 relpath = os.path.relpath(os.getcwd(), home)
 print(
     f"""
-# To start working on the project,
+    # To start working on the project,
 
-cd ~/{relpath}
+    cd ~/{relpath}
 
-"""
+    """
 )
 
 if "pandas" in context["extra_packages"]:
