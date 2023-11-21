@@ -11,7 +11,7 @@ license = "MIT"
 python = ">=3.11,<3.12"
 python-dotenv = "^1.0.0"
 {% if "pandas" in cookiecutter.extra_packages %}
-pandas = "1.5.3"
+pandas = "2.0.3"
 {% endif %}
 
 
@@ -38,7 +38,7 @@ types-toml = "^0.10.3"
 isort = "^5.12.0"
 pre-commit = "^3.3.3"
 {% if "pandas" in cookiecutter.extra_packages %}
-pandas-stubs="1.5.3.230321"
+pandas-stubs="2.0.3.230814"
 {% endif %}
 
 [tool.black]

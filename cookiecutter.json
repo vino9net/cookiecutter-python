@@ -10,7 +10,7 @@
   ],
   "extra_packages": [
     "None",
-    "Install pandas 1.5.3"
+    "Install pandas 2.0.3"
   ],
   "version": "0.1.0",
   "_copy_without_render": [

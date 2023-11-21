@@ -83,7 +83,7 @@ def test_project_with_extra_pacakges(cookies):
     result = cookies.bake(
         extra_context={
             "project_name": "My Data Project",
-            "extra_packages": "Install pandas 1.5.3",
+            "extra_packages": "Install pandas 2.0.3",
         }
     )
 
