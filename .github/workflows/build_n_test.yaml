@@ -35,6 +35,9 @@ jobs:
       run: |
         flake8 --count --show-source --statistics
 
+    # poetry and git are used when running
+    # the unit tests, so we need to install
+    # and configure them properly
     - name: Install and configure Poetry
       uses: snok/install-poetry@v1
       with:
@@ -43,6 +46,11 @@ jobs:
         virtualenvs-in-project: true
         installer-parallel: true
 
+    - uses: oleksiyrudenko/gha-git-credentials@v2.1.1
+      with:
+        global: true
+        name: 'Lazy Dev'
+        email: 'always_ignored@megabank.com'
     - name: Unit tests
       run: |
         pytest -v -s
