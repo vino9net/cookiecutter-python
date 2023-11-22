@@ -35,6 +35,14 @@ jobs:
       run: |
         flake8 --count --show-source --statistics
 
+    - name: Install and configure Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: 1.6.1
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+        installer-parallel: true
+
     - name: Unit tests
       run: |
         pytest -v -s
