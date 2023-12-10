@@ -31,7 +31,7 @@ def run_flake8_in_generated_project(project_path):
         # and blank lines related (E302, E303)
         assert (
             subprocess.call(
-                shlex.split("poetry run flake8 -v --ignore BLK100,E302,E303")
+                shlex.split("poetry run flake8 -v --ignore BLK100,E302,E303,W291,W391")
             )
             == 0
         )
@@ -75,7 +75,7 @@ def test_default_project(cookies):
     print(f"\ntest project generated {result.project_path}")
 
     run_pytest_in_generated_project(result.project_path)
-    # run_flake8_in_generated_project(result.project_path)
+    run_flake8_in_generated_project(result.project_path)
     # run_precommit_in_generated_project(result.project_path)
 
 
@@ -97,7 +97,7 @@ def test_project_with_pandas(cookies):
     print(f"\ntest project generated {result.project_path}")
 
     run_pytest_in_generated_project(result.project_path)
-    # run_flake8_in_generated_project(result.project_path)
+    run_flake8_in_generated_project(result.project_path)
     # run_precommit_in_generated_project(result.project_path)
 
 
@@ -119,5 +119,5 @@ def test_project_with_sqlalchemy(cookies):
     print(f"\ntest project generated {result.project_path}")
 
     run_pytest_in_generated_project(result.project_path)
-    # run_flake8_in_generated_project(result.project_path)
+    run_flake8_in_generated_project(result.project_path)
     # run_precommit_in_generated_project(result.project_path)
