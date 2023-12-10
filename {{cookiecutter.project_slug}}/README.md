@@ -35,6 +35,17 @@ poetry install
 
 ```shell
 
+# update your DATABASE_URL is used
+# create database and assign proper privileges to the user
+# e.g.
+# create database mydb;
+# grant all privileges on database mydb to me;
+
+nano .env
+
+# run alembic migration
+alembic upgrade head
+
 # run unit tests
 pytest
 

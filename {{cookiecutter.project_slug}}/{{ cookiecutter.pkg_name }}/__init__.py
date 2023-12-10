@@ -1,4 +1,1 @@
-import logging
-
-# module level logger
-log = logging.getLogger(__name__)
+# __init__.py

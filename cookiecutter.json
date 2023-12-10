@@ -10,7 +10,8 @@
   ],
   "extra_packages": [
     "None",
-    "Install pandas 2.0.3"
+    "Install pandas 2.0.3",
+    "Install sqlalchemy and alembic with postgresql driver"
   ],
   "version": "0.1.0",
   "_copy_without_render": [

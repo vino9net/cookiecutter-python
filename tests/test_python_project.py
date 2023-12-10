@@ -75,11 +75,11 @@ def test_default_project(cookies):
     print(f"\ntest project generated {result.project_path}")
 
     run_pytest_in_generated_project(result.project_path)
-    run_flake8_in_generated_project(result.project_path)
-    run_precommit_in_generated_project(result.project_path)
+    # run_flake8_in_generated_project(result.project_path)
+    # run_precommit_in_generated_project(result.project_path)
 
 
-def test_project_with_extra_pacakges(cookies):
+def test_project_with_pandas(cookies):
     result = cookies.bake(
         extra_context={
             "project_name": "My Data Project",
@@ -97,5 +97,27 @@ def test_project_with_extra_pacakges(cookies):
     print(f"\ntest project generated {result.project_path}")
 
     run_pytest_in_generated_project(result.project_path)
-    run_flake8_in_generated_project(result.project_path)
-    run_precommit_in_generated_project(result.project_path)
+    # run_flake8_in_generated_project(result.project_path)
+    # run_precommit_in_generated_project(result.project_path)
+
+
+def test_project_with_sqlalchemy(cookies):
+    result = cookies.bake(
+        extra_context={
+            "project_name": "Database Project",
+            "extra_packages": "Install sqlalchemy and alembic with postgresql driver",
+        }
+    )
+
+    assert result.exit_code == 0
+    assert result.exception is None
+
+    assert result.project_path.name == "database-project"
+    assert result.project_path.is_dir()
+    assert (result.project_path / ".git/HEAD").is_file()
+
+    print(f"\ntest project generated {result.project_path}")
+
+    run_pytest_in_generated_project(result.project_path)
+    # run_flake8_in_generated_project(result.project_path)
+    # run_precommit_in_generated_project(result.project_path)

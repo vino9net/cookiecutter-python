@@ -11,6 +11,8 @@ context = json.loads(
 )
 
 dockerfile_option = context["dockerfile_option"]
+extra_packages = context["extra_packages"]
+pkg_name = context["pkg_name"]
 
 if dockerfile_option == "None":
     # none
@@ -20,6 +22,9 @@ if dockerfile_option == "None":
 elif dockerfile_option == "Dockerfile only":
     # dockerfile, no github workflow
     shutil.rmtree(".github")
+elif "sqlalchemy" not in extra_packages:
+    os.unlink(f"{pkg_name}/models.py")
+    os.unlink("tests/test_models.py")
 else:
     # dockerfile and github workflow
     print(

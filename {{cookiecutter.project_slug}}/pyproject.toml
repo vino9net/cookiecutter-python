@@ -10,10 +10,16 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
 python-dotenv = "^1.0.0"
+loguru = "^0.7.2"
 {% if "pandas" in cookiecutter.extra_packages %}
 pandas = "2.0.3"
 {% endif %}
-
+{% if "sqlalchemy" in cookiecutter.extra_packages %}
+sqlalchemy = {extras = ["mypy"], version = "^2.0.23"}
+sqlalchemy-utils = "^0.41.1"
+alembic = "^1.13.0"
+psycopg = {extras = ["binary", "pool"], version = "^3.1.14"}
+{% endif %}
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
