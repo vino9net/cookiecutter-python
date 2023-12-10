@@ -31,7 +31,7 @@ def run_flake8_in_generated_project(project_path):
         # and blank lines related (E302, E303)
         assert (
             subprocess.call(
-                shlex.split("poetry run flake8 -v --ignore BLK100,E302,E303,W291,W391")
+                shlex.split("poetry run flake8 --ignore BLK100,E302,E303,W291,W391")
             )
             == 0
         )

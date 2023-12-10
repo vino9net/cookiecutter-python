@@ -1,11 +1,11 @@
 import os
 import sys
-from loguru import logger
 
 {% if "sqlalchemy" in cookiecutter.extra_packages %}
 import pytest
 from alembic import command
 from alembic.config import Config
+from loguru import logger
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
@@ -13,9 +13,6 @@ from sqlalchemy_utils import create_database, database_exists, drop_database
 {% endif %}
 cwd = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(f"{cwd}/.."))
-
-logger.remove()
-logger.add(sys.stdout, level="WARNING", filter="{{ cookiecutter.pkg_name }}")
 
 {% if "sqlalchemy" in cookiecutter.extra_packages %}
 from {{ cookiecutter.pkg_name }}.models import User  # noqa: E402
