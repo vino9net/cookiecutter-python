@@ -3,7 +3,7 @@
   "packages": {
     "poetry@1.6.1": {
       "last_modified": "2023-10-25T20:49:13Z",
-      "plugin_version": "0.0.3",
+      "plugin_version": "0.0.4",
       "resolved": "github:NixOS/nixpkgs/75a52265bda7fd25e06e3a67dee3f0354e73243c#poetry",
       "source": "devbox-search",
       "version": "1.6.1",
@@ -24,7 +24,7 @@
     },
     "python@3.11": {
       "last_modified": "2023-10-25T20:49:13Z",
-      "plugin_version": "0.0.1",
+      "plugin_version": "0.0.3",
       "resolved": "github:NixOS/nixpkgs/75a52265bda7fd25e06e3a67dee3f0354e73243c#python3",
       "source": "devbox-search",
       "version": "3.11.5",

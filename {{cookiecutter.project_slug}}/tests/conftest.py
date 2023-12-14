@@ -7,6 +7,7 @@ from alembic import command
 from alembic.config import Config
 from loguru import logger
 from sqlalchemy import create_engine
+from sqlalchemy.engine import make_url
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
@@ -15,7 +16,7 @@ cwd = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(f"{cwd}/.."))
 
 {% if "sqlalchemy" in cookiecutter.extra_packages %}
-from {{ cookiecutter.pkg_name }}.models import User  # noqa: E402
+from {{cookiecutter.pkg_name}}.models import User  # noqa: E402
 
 
 @pytest.fixture(scope="session")
@@ -24,18 +25,29 @@ def sql_engine(tmp_path_factory):
     if test_db_url is None:
         test_db_url = f"sqlite:///{tmp_path_factory.getbasetemp()}/test.db"
 
+    test_db_url = make_url(url_str)
+    if test_db_url.drivername.startswith("postgres"):
+        if not test_db_url.username:
+            test_db_url = test_db_url.set(username=os.environ.get("TEST_PGUSER"))
+        if not test_db_url.password:
+            test_db_url = test_db_url.set(password=os.environ.get("TEST_PGPASSWORD"))
+
     if not database_exists(test_db_url):
         logger.info(f"creating test database {test_db_url}")
         create_database(test_db_url)
 
+    # Run the migrations
+    # migrations/env.py sets the sqlalchemy.url using env var DATABASE_URL
+    # so we set it so that alembic knows to use the correct database during testing
+    os.environ["DATABASE_URL"] = test_db_url.render_as_string(hide_password=False)
+    alembic_cfg = Config("alembic.ini")
+    command.upgrade(alembic_cfg, "head")
+
     sql_engine = create_engine(test_db_url)
 
-    # Run the migrations
-    # set this so that the alembic migration script can find the db url
-    os.environ["DATABASE_URL"] = test_db_url
-    alembic_cfg = Config("alembic.ini")
-    alembic_cfg.set_main_option("sqlalchemy.url", test_db_url)
-    command.upgrade(alembic_cfg, "head")
+    # seed test data
+    with sessionmaker(bind=sql_engine)() as session:
+        seed_data(session)
 
     yield sql_engine
 
@@ -49,7 +61,6 @@ def sql_engine(tmp_path_factory):
 def session(sql_engine):
     Session = sessionmaker(bind=sql_engine)
     session = Session()
-    seed_data(session)
 
     yield session
 
