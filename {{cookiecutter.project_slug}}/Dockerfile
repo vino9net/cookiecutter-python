@@ -1,15 +1,29 @@
+# stage 1: build
 FROM python:3.11-bullseye as builder
 
-run apt-get update && apt-get install -y \
-    build-essential libgdbm6 libgdbm-dev
+# install packages needed by python packages
+RUN apt-get update \
+    && apt-get install -y build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
+# create virtualenv and install dependencies
+RUN python -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
 COPY requirements.txt .
-RUN pip install --root="/install" -r requirements.txt
+RUN pip install -r requirements.txt
 
-# runtime
+# stage 2: runtime
 FROM python:3.11-slim-bullseye
 
-COPY --from=builder /install /
-COPY . .
+# create user
+RUN addgroup --system app && adduser --system --group app
+USER app
+WORKDIR /app
 
-CMD  ["/bin/sleep", "10000"]
+# copy virtualenv from builder
+COPY --chown=app:app --from=builder /app/venv /app/venv
+# copy application code. update .dockerignore to files that shouldn't be copied
+COPY --chown=app:app . .
+
+ENV PATH="/app/venv/bin:$PATH"
+CMD  ["/bin/sleep", "100000"]
