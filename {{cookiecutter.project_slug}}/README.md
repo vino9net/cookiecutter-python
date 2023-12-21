@@ -50,3 +50,13 @@ alembic upgrade head
 pytest
 
 ```
+
+## generate code using config file without interactive input
+
+Create a [config file](sample_prog.json) with options to use, then
+
+```shell
+
+cookiecutter gh:vino9org/cookiecutter-python --config-file sample_prog.json --no-input
+
+```
