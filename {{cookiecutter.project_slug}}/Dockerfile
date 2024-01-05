@@ -1,5 +1,7 @@
 # stage 1: build
 FROM python:3.11-bullseye as builder
+LABEL org.opencontainers.image.source https://github.com/owner/{{ cookiecutter.project_slug }}
+LABEL org.opencontainers.image.description "{{ cookiecutter.project_short_description }}"
 
 # install packages needed by python packages
 RUN apt-get update \
