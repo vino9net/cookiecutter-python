@@ -7,7 +7,6 @@ from alembic import command
 from alembic.config import Config
 from loguru import logger
 from sqlalchemy import create_engine
-from sqlalchemy.engine import make_url
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
@@ -25,7 +24,6 @@ def sql_engine(tmp_path_factory):
     if test_db_url is None:
         test_db_url = f"sqlite:///{tmp_path_factory.getbasetemp()}/test.db"
 
-    test_db_url = make_url(url_str)
     if test_db_url.drivername.startswith("postgres"):
         if not test_db_url.username:
             test_db_url = test_db_url.set(username=os.environ.get("TEST_PGUSER"))

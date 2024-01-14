@@ -1,4 +1,8 @@
 [flake8]
+{% if "sqlalchemy" in cookiecutter.extra_packages %}
+exclude = .git,__pycache__,venv,.venv,*.lock,migrations
+{% else %}
 exclude = .git,__pycache__,venv,.venv,*.lock
+{% endif %}
 extend-ignore = E203,E266,T101
 max-line-length = 120
