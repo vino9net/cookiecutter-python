@@ -24,7 +24,7 @@ def sql_engine(tmp_path_factory):
     if test_db_url is None:
         test_db_url = f"sqlite:///{tmp_path_factory.getbasetemp()}/test.db"
 
-    if test_db_url.drivername.startswith("postgres"):
+    if test_db_url.startswith("postgres"):
         if not test_db_url.username:
             test_db_url = test_db_url.set(username=os.environ.get("TEST_PGUSER"))
         if not test_db_url.password:
@@ -37,7 +37,7 @@ def sql_engine(tmp_path_factory):
     # Run the migrations
     # migrations/env.py sets the sqlalchemy.url using env var DATABASE_URL
     # so we set it so that alembic knows to use the correct database during testing
-    os.environ["DATABASE_URL"] = test_db_url.render_as_string(hide_password=False)
+    os.environ["DATABASE_URL"] = test_db_url
     alembic_cfg = Config("alembic.ini")
     command.upgrade(alembic_cfg, "head")
 
@@ -49,7 +49,7 @@ def sql_engine(tmp_path_factory):
 
     yield sql_engine
 
-    if os.environ.get("KEEP_TEST_DB").upper() not in ["1", "Y", "YES", "TRUE"]:
+    if os.environ.get("KEEP_TEST_DB", "N").upper() not in ["1", "Y", "YES", "TRUE"]:
         # drop the test database
         logger.info(f"dropping test database {test_db_url}")
         drop_database(test_db_url)

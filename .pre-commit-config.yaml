@@ -1,4 +1,4 @@
-exclude: "^$|deploy|scripts|tmp"
+exclude: "^$|deploy|scripts|tmp|{{cookiecutter.project_slug}}"
 fail_fast: false
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks

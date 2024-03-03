@@ -20,11 +20,7 @@ if dockerfile_option == "None":
     os.unlink("Dockerfile")
     os.unlink(".dockerignore")
 elif dockerfile_option == "Dockerfile only":
-    # dockerfile, no github workflow
     shutil.rmtree(".github")
-elif "sqlalchemy" not in extra_packages:
-    os.unlink(f"{pkg_name}/models.py")
-    os.unlink("tests/test_models.py")
 else:
     # dockerfile and github workflow
     print(
@@ -41,6 +37,12 @@ else:
 
     """
     )
+
+if "sqlalchemy" not in extra_packages:
+    os.unlink(f"{pkg_name}/models.py")
+    os.unlink("tests/test_models.py")
+    os.unlink("alembic.ini")
+    shutil.rmtree("migrations")
 
 # create a git repo, everybody needs this, right?
 print("Initializing git repo...")
