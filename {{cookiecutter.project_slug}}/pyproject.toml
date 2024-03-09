@@ -49,9 +49,13 @@ pandas-stubs="2.0.3.230814"
 
 [tool.black]
 line-length = 120
+include = '\.pyi?$'
+extend-exclude = ["venv", "{{cookiecutter.project_slug}}"]
 
 [tool.isort]
 profile = "black"
+line_length = 120
+
 
 [tool.pytest.ini_options]
 minversion = "6.0"
