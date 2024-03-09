@@ -7,6 +7,8 @@ on:
     - main
 
   pull_request:
+    branches:
+    - develop
     types: [opened, edited, reopened]
 
   workflow_dispatch:
