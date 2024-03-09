@@ -50,7 +50,7 @@ pandas-stubs="2.0.3.230814"
 [tool.black]
 line-length = 120
 include = '\.pyi?$'
-extend-exclude = ["venv", "{{cookiecutter.project_slug}}"]
+#extend-exclude = ["venv"]
 
 [tool.isort]
 profile = "black"
