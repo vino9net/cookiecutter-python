@@ -1,0 +1,10 @@
+{
+    "name": "Python & Poetry with Pre-commit",
+    "image": "mcr.microsoft.com/vscode/devcontainers/python:0-3.11",
+    "postCreateCommand": "bash -c 'poetry install && pre-commit install'",
+    "extensions": [
+      "ms-python.python",
+      "ms-python.vscode-pylance"
+    ]
+  }
+  
