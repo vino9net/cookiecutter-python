@@ -73,8 +73,8 @@ jobs:
         images: ghcr.io/${{ github.repository }}
         tags: |
           type=ref,event=tag
-          type=raw,value=develop-{{date 'YYYYMMDD-HHmmss' tz='Asia/Singapore'}}-{{sha}},enable=${{ github.ref == 'refs/heads/develop') }}
-          type=release,value=develop-{{date 'YYYYMMDD-HHmmss' tz='Asia/Singapore'}}-{{sha}},enable=${{ github.ref == 'refs/heads/develop') }}
+          type=raw,value=develop-{{date 'YYYYMMDD-HHmmss' tz='Asia/Singapore'}}-{{sha}},enable=${{ github.ref == 'refs/heads/develop' }}
+          type=release,value=develop-{{date 'YYYYMMDD-HHmmss' tz='Asia/Singapore'}}-{{sha}},enable=${{ github.ref == 'refs/heads/develop' }}
         flavor: |
           latest=false
         labels: |
