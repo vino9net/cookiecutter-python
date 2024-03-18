@@ -11,9 +11,6 @@ license = "MIT"
 python = ">=3.11,<3.12"
 python-dotenv = "^1.0.0"
 loguru = "^0.7.2"
-{% if "pandas" in cookiecutter.extra_packages %}
-pandas = "2.0.3"
-{% endif %}
 {% if "sqlalchemy" in cookiecutter.extra_packages %}
 sqlalchemy = {extras = ["mypy"], version = "^2.0.23"}
 sqlalchemy-utils = "^0.41.1"
@@ -43,9 +40,6 @@ types-setuptools = "^57.4.8"
 types-toml = "^0.10.3"
 isort = "^5.12.0"
 pre-commit = "^3.3.3"
-{% if "pandas" in cookiecutter.extra_packages %}
-pandas-stubs="2.0.3.230814"
-{% endif %}
 
 [tool.black]
 line-length = 120

@@ -64,24 +64,10 @@ print(
     """
 )
 
-if "pandas" in context["extra_packages"]:
-    print(
-        """
-    #
-    # If you use pandas, please check pyproject.toml to make sure the version
-    # of package and stubs are the correct version you want to use.
-    # Search PyPI for the correct version of the packages.
-
-    # If you use devbox, please check devbox.json to make
-    # sure the pandas package there matches the version in pyproject.toml.
-    #
-    """
-    )
-
 print(
     """
 
-    poetry install
+    poetry install --no-root
     poettry export -f requirements.txt -o requirements.txt --without-hashes
     poettry export -f requirements.txt --group dev -o requirements-dev.txt --without-hashes
     poetry shell

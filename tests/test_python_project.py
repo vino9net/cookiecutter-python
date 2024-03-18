@@ -84,42 +84,18 @@ def check_project_structure(project_path, context):
     if "sqlalchemy" in extra_packages:
         assert (project_path / "alembic.ini").is_file()
         assert (project_path / "migrations").is_dir()
-    elif "pandas" in extra_packages:
-        pyproject_toml = (project_path / "pyproject.toml").read_text()
-        assert "pandas =" in pyproject_toml
 
 
 def test_default_project(cookies):
     result = cookies.bake(
         extra_context={
             "project_name": "My Default Project",
-            "extra_packages": "Install pandas 2.0.3",
         }
     )
 
     assert result.exit_code == 0
     assert result.exception is None
     assert result.project_path.name == "my-default-project"
-
-    check_project_structure(result.project_path, result.context)
-    print(f"\ntest project generated {result.project_path}")
-
-    run_pytest_in_generated_project(result.project_path)
-    run_flake8_in_generated_project(result.project_path)
-    run_precommit_in_generated_project(result.project_path)
-
-
-def test_project_with_pandas(cookies):
-    result = cookies.bake(
-        extra_context={
-            "project_name": "My Data Project",
-            "extra_packages": "Install pandas 2.0.3",
-        }
-    )
-
-    assert result.exit_code == 0
-    assert result.exception is None
-    assert result.project_path.name == "my-data-project"
 
     check_project_structure(result.project_path, result.context)
     print(f"\ntest project generated {result.project_path}")

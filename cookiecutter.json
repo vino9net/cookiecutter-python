@@ -4,17 +4,17 @@
   "pkg_name": "{{ cookiecutter.project_slug|replace('-', '_') }}",
   "project_short_description": "Generic Python3 project",
   "dockerfile_option": [
-    "Dockerfile with Github workflow",
     "Dockerfile only",
+    "Dockerfile with Github workflow",
     "None"
   ],
   "extra_packages": [
     "None",
-    "Install pandas 2.0.3",
     "Install sqlalchemy and alembic with postgresql driver"
   ],
   "version": "0.1.0",
   "_copy_without_render": [
-    ".github/workflows/build.yaml"
+    ".github/workflows/python_build.yaml",
+    ".devcontainer/devcontainer.json"
   ]
 }
