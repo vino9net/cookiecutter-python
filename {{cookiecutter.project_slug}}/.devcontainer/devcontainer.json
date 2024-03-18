@@ -1,0 +1,21 @@
+{
+    "name": "vino9-python311-poetry",
+    "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.debugpy",
+                "ms-python.black-formatter",
+                "ms-python.flake8",
+                "ms-python.isort",
+                "ms-python.mypy-type-checker",
+                "yzhang.markdown-all-in-one"
+            ]
+        }
+    },
+    "remoteUser": "vscode",
+    "forwardPorts": [],
+    "postCreateCommand": "pip install poetry==1.7.1 && poetry install --no-root && git config --global --add safe.directory ${containerWorkspaceFolder} && poetry run pre-commit install "
+}
