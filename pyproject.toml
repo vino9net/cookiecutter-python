@@ -37,7 +37,7 @@ src_paths = ["hooks","tests"]
 [tool.black]
 line-length = 120
 include = '\.pyi?$'
-extend-exclude = ["{{cookiecutter.project_slug}}/"]
+extend-exclude = "{{cookiecutter.project_slug}}/"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
