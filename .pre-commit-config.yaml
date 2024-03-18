@@ -27,6 +27,10 @@ repos:
     entry: black .
     language: system
     types: [python]
+  - id: isort
+    name: formatting::isort
+    entry: isort
+    language: system
   - id: flake8
     name: linting::flake8
     entry: flake8
