@@ -12,7 +12,7 @@ The following linting tools are also required and preconfigured to use with the 
 * pre-commit
 
 
-Visual Studio Code is the preferred editor for the author and the [settings]({{cookiecutter.pkg_name}}/.vscode/settings.json) are provided for quick startup. 
+Visual Studio Code is the preferred editor for the author and the [settings]({{cookiecutter.pkg_name}}/.vscode/settings.json) are provided for quick startup.
 
 To use the template, please install cookiecutter on your computer by following [instructions here](https://cookiecutter.readthedocs.io/en/latest/installation.html)
 
@@ -24,7 +24,7 @@ cookiecutter gh:vino9org/cookiecutter-python
 # init venv and install dependencies
 cd <project_path>
 poetry shell
-poetry install
+poetry install --no-root --with linting
 
 # kick the tires...
 pytest -v

@@ -13,7 +13,7 @@ def run_pytest_in_generated_project(project_path):
     try:
         os.chdir(project_path)
 
-        subprocess.call(["poetry", "install"])
+        subprocess.call(["poetry", "install", "--no-root"])
         assert subprocess.call(shlex.split("poetry run pytest -v -s")) == 0
     finally:
         os.chdir(current_path)
@@ -28,7 +28,7 @@ def run_flake8_in_generated_project(project_path):
     try:
         os.chdir(project_path)
 
-        subprocess.call(["poetry", "install"])
+        subprocess.call(["poetry", "install", "--no-root", "--with", "linting"])
         # run flake8 but ignore auto reformat of black (BLK100)
         # and blank lines related (E302, E303)
         assert subprocess.call(shlex.split("poetry run flake8 --ignore BLK100,E302,E303,W291,W391")) == 0
@@ -45,7 +45,7 @@ def run_precommit_in_generated_project(project_path):
     try:
         os.chdir(project_path)
 
-        subprocess.call(["poetry", "install"])
+        subprocess.call(["poetry", "install", "--no-root", "--with", "linting"])
         assert subprocess.call(shlex.split("poetry run pre-commit install")) == 0
 
         # is adding a file necceeary?
