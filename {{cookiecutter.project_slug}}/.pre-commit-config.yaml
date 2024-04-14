@@ -18,7 +18,7 @@ repos:
   - id: poetry-export
     args: ["-f", "requirements.txt", "-o", "requirements.txt", "--without-hashes"]
   - id: poetry-export
-    args: ["--with=dev", "-f", "requirements.txt", "-o", "requirements-dev.txt", "--without-hashes"]
+    args: ["--with=dev", "--with=linting", "-f", "requirements.txt", "-o", "requirements-dev.txt", "--without-hashes"]
 
 - repo: local
   hooks:
