@@ -35,13 +35,16 @@ def run_linting_in_generated_project(project_path):
             capture_output=True,
             text=True,
         )
-        if result.returncode:
-            print("=== stdout ===")
-            print(result.stdout)
-            print("=== stderr ===")
-            print(result.stderr)
+        assert result.returncode == 0, f"==RUFF output===\n{result.stdout}"
 
-        assert result.returncode == 0
+        if os.environ.get("SKIP_MYPY", "0") != "1":
+            result = subprocess.run(
+                shlex.split("poetry run mypy ."),
+                capture_output=True,
+                text=True,
+            )
+            assert result.returncode == 0, f"==MYPY output===\n{result.stdout}"
+
     finally:
         os.chdir(current_path)
 

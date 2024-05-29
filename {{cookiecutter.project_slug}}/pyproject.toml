@@ -62,6 +62,9 @@ select = ["E", "F", "W", "C", "I", "A"]  # Enable checks for PEP8, imports, and 
 ignore = ["E203", "E266"]
 
 [tool.mypy]
+{% if "sqlalchemy" in cookiecutter.extra_packages %}
+plugins = ["sqlalchemy.ext.mypy.plugin"]
+{% endif %}
 warn_return_any = false
 warn_unused_configs = true
 no_implicit_optional = true
