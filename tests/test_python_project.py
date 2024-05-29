@@ -19,7 +19,7 @@ def run_pytest_in_generated_project(project_path):
         os.chdir(current_path)
 
 
-def run_flake8_in_generated_project(project_path):
+def run_linting_in_generated_project(project_path):
     if not os.path.isdir(project_path):
         return
 
@@ -28,10 +28,20 @@ def run_flake8_in_generated_project(project_path):
     try:
         os.chdir(project_path)
 
-        subprocess.call(["poetry", "install", "--no-root", "--with", "linting"])
-        # run flake8 but ignore auto reformat of black (BLK100)
-        # and blank lines related (E302, E303)
-        assert subprocess.call(shlex.split("poetry run flake8 --ignore BLK100,E302,E303,W291,W391")) == 0
+        subprocess.call(["poetry", "install", "--no-root"])
+        # run ruff but ignore formatting realted errors
+        result = subprocess.run(
+            shlex.split("poetry run ruff check . --ignore I001,E302,E303,W291,W391 --verbose"),
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode:
+            print("=== stdout ===")
+            print(result.stdout)
+            print("=== stderr ===")
+            print(result.stderr)
+
+        assert result.returncode == 0
     finally:
         os.chdir(current_path)
 
@@ -45,7 +55,7 @@ def run_precommit_in_generated_project(project_path):
     try:
         os.chdir(project_path)
 
-        subprocess.call(["poetry", "install", "--no-root", "--with", "linting"])
+        subprocess.call(["poetry", "install", "--no-root"])
         assert subprocess.call(shlex.split("poetry run pre-commit install")) == 0
 
         # is adding a file necceeary?
@@ -56,9 +66,9 @@ def run_precommit_in_generated_project(project_path):
 
         # skip black formatting for pre-commit
         # it is prone to fail and too much hassle to fix
-        env = os.environ.copy()
-        env["SKIP"] = "black"
-        assert subprocess.call(shlex.split("poetry run pre-commit run"), env=env) == 0
+        # env = os.environ.copy()
+        # env["SKIP"] = "black"
+        assert subprocess.call(shlex.split("poetry run pre-commit run")) == 0
     finally:
         os.chdir(current_path)
 
@@ -101,7 +111,7 @@ def test_default_project(cookies):
     print(f"\ntest project generated {result.project_path}")
 
     run_pytest_in_generated_project(result.project_path)
-    run_flake8_in_generated_project(result.project_path)
+    run_linting_in_generated_project(result.project_path)
     run_precommit_in_generated_project(result.project_path)
 
 
@@ -121,5 +131,5 @@ def test_project_with_sqlalchemy(cookies):
     print(f"\ntest project generated {result.project_path}")
 
     run_pytest_in_generated_project(result.project_path)
-    run_flake8_in_generated_project(result.project_path)
+    run_linting_in_generated_project(result.project_path)
     run_precommit_in_generated_project(result.project_path)

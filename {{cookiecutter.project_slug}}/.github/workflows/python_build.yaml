@@ -52,7 +52,7 @@ jobs:
 
     - name: Linting
       run: |
-        flake8 --count --show-source --statistics
+        ruff run check .
 
     - name: Unit tests
       id: unit_tests

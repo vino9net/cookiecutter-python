@@ -3,9 +3,7 @@
 
 This project is set up Python project with dev tooling pre-configured
 
-* black
-* flake8
-* isort
+* ruff
 * mypy
 * VS Code support
 
@@ -22,7 +20,7 @@ The more traditional way is to install python 3.11 and [poetry](https://python-p
 poetry shell
 
 # install dependencies
-poetry install --no-root --with linting
+poetry install --no-root
 ```
 
 ## Develop the code for the stack
@@ -51,6 +49,21 @@ Create a [config file](sample_prog.json) with options to use, then
 
 ```shell
 
-cookiecutter gh:vino9org/cookiecutter-python --config-file sample_prog.json --no-input
+cat <<EOF > config.json
+{
+    "default_context": {
+        "project_name": "Some Program",
+        "project_slug": "some_prog",
+        "pkg_name": "some_prog",
+        "project_short_description": "Some python program",
+        "dockerfile_option": "Dockerfile with Github workflow",
+        "extra_packages": "None",
+        "version": "0.1.0"
+    }
+}
+EOF
+
+
+cookiecutter gh:vino9org/cookiecutter-python --config-file config.json --no-input
 
 ```

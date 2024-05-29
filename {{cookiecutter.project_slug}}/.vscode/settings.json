@@ -11,14 +11,8 @@
             "source.organizeImports": "explicit",
             "source.fixAll": "explicit"
         },
-        "editor.defaultFormatter": "ms-python.black-formatter"
+        "editor.defaultFormatter": "charliermarsh.ruff"
     },
-    "flake8.args": [
-        "--config=.flake8"
-    ],
-    "flake8.ignorePatterns": [
-        ".venv/**/*.py"
-    ],
     "mypy-type-checker.preferDaemon": true,
     "jupyter.debugJustMyCode": false
 }

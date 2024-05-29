@@ -27,3 +27,5 @@ pytest_junit.xml
 # AWS SAM CLI
 .aws-sam/
 
+# sample files
+config.json
