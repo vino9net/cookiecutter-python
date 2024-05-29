@@ -35,7 +35,7 @@ jobs:
     - name: Linting
       if: success()
       run: |
-        poetry run ruff check .
+        ruff check .
         
     # poetry and git are used when running
     # the unit tests, so we need to install
