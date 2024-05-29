@@ -5,9 +5,7 @@ This is a cookiecutter template for generic Python3 project with preconfigured l
 The [poetry](https://python-poetry.org/) package manager should exist in PATH in order to use this template.
 
 The following linting tools are also required and preconfigured to use with the generated project:
-* flake8
-* isort
-* black
+* ruff
 * mypy
 * pre-commit
 
@@ -24,7 +22,7 @@ cookiecutter gh:vino9org/cookiecutter-python
 # init venv and install dependencies
 cd <project_path>
 poetry shell
-poetry install --no-root --with linting
+poetry install --no-root
 
 # kick the tires...
 pytest -v
@@ -32,3 +30,12 @@ pytest -v
 # hack away!
 
 ```
+
+## Design Decisions
+This section logs design decisions made in this project.
+
+| Decision          | Reason                                                                                                                                                                                                                                                                           |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [```poetry.toml```](poetry.toml) | The ```in-project = true``` setting instructs poetry to create a virtual env in project directory, so that ```python.defaultInterpreterPath``` in [```settings.json```](.vscode/settings.json) can be hard coded to ```.venv/bin/python```. This allows VSCode to access lint tools installed by package mananager, e.g. ruff, mypy, etc. The downside is the ```.venv``` directory needs to be deleted and recreated when switching between devcontainer and local python |
+| [```pyproject.toml```](pyproject.toml) | all linting related configuration are consolidated into the same file to easier configuration |
+| [```.pre-commit-config.yaml```](.pre-commit-config.yaml) | ```pre-commit@3.4.4``` and ```poetry@1.7.1``` apparently make conflicting changes to ```requirements.txt```, so bypass the files is required |
