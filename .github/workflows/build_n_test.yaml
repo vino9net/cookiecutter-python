@@ -35,8 +35,8 @@ jobs:
     - name: Linting
       if: success()
       run: |
-        flake8 --count --show-source --statistics
-
+        poetry run ruff check .
+        
     # poetry and git are used when running
     # the unit tests, so we need to install
     # and configure them properly
