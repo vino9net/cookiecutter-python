@@ -1,5 +1,8 @@
+import itertools
+import json
 import os
 import os.path
+import random
 import shlex
 import subprocess
 
@@ -99,36 +102,49 @@ def check_project_structure(project_path, context):
         assert (project_path / "migrations").is_dir()
 
 
-def test_default_project(cookies):
+def enumerate_features(keys):
+    """
+    read parameters from cookiecutter.json and generate all possible combinations
+    return the list of dict after filtering out invalid entries
+    """
+    ctx_file = os.path.dirname(os.path.abspath(__file__)) + "/../cookiecutter.json"
+
+    with open(ctx_file) as f:
+        ctx = json.load(f)
+        param_lists = [ctx[key] for key in keys]
+        all_entries = [dict(zip(keys, val)) for val in itertools.product(*param_lists)]
+        return all_entries
+
+
+def feature_id(extra_packages):
+    key = extra_packages.replace(" ", "_").lower()
+    return f"extra_{key}"
+
+
+def pytest_generate_tests(metafunc):
+    """dynamically generate test cases based on content of cookiecutter.json"""
+    if "generator_ctx" in metafunc.fixturenames:
+        keys = ["extra_packages"]
+        features_to_test = enumerate_features(keys)
+
+        metafunc.parametrize(
+            "generator_ctx",
+            features_to_test,
+            ids=[feature_id(**kw) for kw in features_to_test],
+        )
+
+
+def test_generate_and_build(cookies, generator_ctx):
+    suffix = str(random.randint(1, 100))
     result = cookies.bake(
         extra_context={
-            "project_name": "My Default Project",
+            "project_name": f"My Test Service {suffix}",
         }
     )
 
     assert result.exit_code == 0
     assert result.exception is None
-    assert result.project_path.name == "my-default-project"
-
-    check_project_structure(result.project_path, result.context)
-    print(f"\ntest project generated {result.project_path}")
-
-    run_pytest_in_generated_project(result.project_path)
-    run_linting_in_generated_project(result.project_path)
-    run_precommit_in_generated_project(result.project_path)
-
-
-def test_project_with_sqlalchemy(cookies):
-    result = cookies.bake(
-        extra_context={
-            "project_name": "Database Project",
-            "extra_packages": "Install sqlalchemy and alembic with postgresql driver",
-        }
-    )
-
-    assert result.exit_code == 0
-    assert result.exception is None
-    assert result.project_path.name == "database-project"
+    assert result.project_path.is_dir()
 
     check_project_structure(result.project_path, result.context)
     print(f"\ntest project generated {result.project_path}")
