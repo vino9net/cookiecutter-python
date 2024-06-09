@@ -1,21 +1,21 @@
 # stage 1: build
-FROM python:3.11-bullseye as builder
+FROM python:3.12-bookworm as builder
 LABEL org.opencontainers.image.source https://github.com/owner/{{ cookiecutter.project_slug }}
 LABEL org.opencontainers.image.description "{{ cookiecutter.project_short_description }}"
 
 # install packages needed by python packages
 RUN apt-get update \
-    && apt-get install -y build-essential \
+    && apt-get install --yes --no-install-recommends build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # create virtualenv and install dependencies
 RUN python -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY requirements.lock .
+RUN pip install --no-cache-dir -r requirements.lock
 
 # stage 2: runtime
-FROM python:3.11-slim-bullseye
+FROM python:3.12-slim-bookworm
 
 # create user
 RUN addgroup --system app && adduser --system --group app

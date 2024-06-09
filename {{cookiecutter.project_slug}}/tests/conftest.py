@@ -5,10 +5,12 @@ import sys
 import pytest
 from alembic import command
 from alembic.config import Config
-from loguru import logger
+import logging
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
+
+logger = logging.getLogger(__name__)
 
 {% endif %}
 cwd = os.path.dirname(os.path.abspath(__file__))

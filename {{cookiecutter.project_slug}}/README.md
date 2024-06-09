@@ -11,16 +11,14 @@ This project is set up Python project with dev tooling pre-configured
 
 The easiest way to get started is use [Visual Studio Code with devcontainer](https://code.visualstudio.com/docs/devcontainers/containers)
 
-The more traditional way is to install python 3.11 and [poetry](https://python-poetry.org/), then
+[rye](https://github.com/astral-sh/rye) is the blazing fast python project manager tool. Install it first before proceeding.
 
 
 ```shell
 
-# create virtualenv
-poetry shell
+# create virtualenv and install dependencies
+rye sync
 
-# install dependencies
-poetry install --no-root
 ```
 
 ## Develop the code for the stack

@@ -4,5 +4,6 @@
 
 # White-list what we need
 
-!requirements.txt
+!requirements*.txt
+!requirements*.lock
 !*.py

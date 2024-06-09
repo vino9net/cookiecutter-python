@@ -1,6 +1,6 @@
 {
-    "name": "vino9-python311-poetry",
-    "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
+    "name": "python-rye",
+    "image": "mcr.microsoft.com/devcontainers/base:bookworm",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -14,12 +14,7 @@
         }
     },
     "features": {
-        "ghcr.io/devcontainers-contrib/features/poetry:2": {
-            "version": "1.7.1"
-        },
-        "ghcr.io/devcontainers-contrib/features/pre-commit:2": {
-            "version": "3.7.1"
-        },
+        "ghcr.io/schlich/devcontainer-features/rye:1": {},
     },
     "remoteUser": "vscode",
     "forwardPorts": [],

@@ -1,5 +1,0 @@
-[warnings]
-export = false
-
-[virtualenvs]
-in-project = true

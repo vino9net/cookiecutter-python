@@ -67,11 +67,13 @@ print(
 print(
     """
 
-    poetry install --no-root
-    poetry shell
+    rye sync
 
     # install pre-commit to ensure linting tools are run before code is committed
-    pre-commit install
+    rye run pre-commit install
+
+    # activate new venv
+    source .venv/bin/activate
 
     # Hack away!
 

@@ -16,8 +16,8 @@ def run_pytest_in_generated_project(project_path):
     try:
         os.chdir(project_path)
 
-        subprocess.call(["poetry", "install", "--no-root"])
-        assert subprocess.call(shlex.split("poetry run pytest -v -s")) == 0
+        subprocess.call(shlex.split("rye sync"))
+        assert subprocess.call(shlex.split("rye run pytest -v -s")) == 0
     finally:
         os.chdir(current_path)
 
@@ -31,10 +31,10 @@ def run_linting_in_generated_project(project_path):
     try:
         os.chdir(project_path)
 
-        subprocess.call(["poetry", "install", "--no-root"])
+        subprocess.call(shlex.split("rye sync"))
         # run ruff but ignore formatting realted errors
         result = subprocess.run(
-            shlex.split("poetry run ruff check . --ignore I001,E302,E303,W291,W391 --verbose"),
+            shlex.split("rye run ruff check . --ignore I001,E302,E303,W291,W391 --verbose"),
             capture_output=True,
             text=True,
         )
@@ -42,7 +42,7 @@ def run_linting_in_generated_project(project_path):
 
         if os.environ.get("SKIP_MYPY", "0") != "1":
             result = subprocess.run(
-                shlex.split("poetry run mypy ."),
+                shlex.split("rye run mypy ."),
                 capture_output=True,
                 text=True,
             )
@@ -61,8 +61,8 @@ def run_precommit_in_generated_project(project_path):
     try:
         os.chdir(project_path)
 
-        subprocess.call(["poetry", "install", "--no-root"])
-        assert subprocess.call(shlex.split("poetry run pre-commit install")) == 0
+        subprocess.call(shlex.split("rye sync"))
+        assert subprocess.call(shlex.split("rye run pre-commit install")) == 0
 
         # is adding a file necceeary?
         with open("a.py", "w") as f:
@@ -74,7 +74,7 @@ def run_precommit_in_generated_project(project_path):
         # it is prone to fail and too much hassle to fix
         # env = os.environ.copy()
         # env["SKIP"] = "black"
-        assert subprocess.call(shlex.split("poetry run pre-commit run")) == 0
+        assert subprocess.call(shlex.split("rye run pre-commit run")) == 0
     finally:
         os.chdir(current_path)
 
