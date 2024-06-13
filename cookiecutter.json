@@ -3,6 +3,10 @@
   "project_slug": "{{ cookiecutter.project_name|lower|replace(' ', '-') }}",
   "pkg_name": "{{ cookiecutter.project_slug|replace('-', '_') }}",
   "project_short_description": "Generic Python3 project",
+  "use_devcontainer": [
+    "No",
+    "Yes"
+  ],
   "dockerfile_option": [
     "Dockerfile only",
     "Dockerfile with Github workflow",

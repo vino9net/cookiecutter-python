@@ -13,6 +13,10 @@ context = json.loads(
 dockerfile_option = context["dockerfile_option"]
 extra_packages = context["extra_packages"]
 pkg_name = context["pkg_name"]
+use_devcontainer = context["use_devcontainer"]
+
+if use_devcontainer != "Yes":
+    shutil.rmtree(".devcontainer")
 
 if dockerfile_option == "None":
     # none

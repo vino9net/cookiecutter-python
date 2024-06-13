@@ -5,6 +5,7 @@ import os.path
 import random
 import shlex
 import subprocess
+from typing import Any
 
 
 def run_pytest_in_generated_project(project_path):
@@ -70,10 +71,6 @@ def run_precommit_in_generated_project(project_path):
             f.write("some_var = 0\n")
         assert subprocess.call(shlex.split("git add a.py")) == 0
 
-        # skip black formatting for pre-commit
-        # it is prone to fail and too much hassle to fix
-        # env = os.environ.copy()
-        # env["SKIP"] = "black"
         assert subprocess.call(shlex.split("rye run pre-commit run")) == 0
     finally:
         os.chdir(current_path)
@@ -83,9 +80,16 @@ def check_project_structure(project_path, context):
     """check generate project structure based on options"""
     dockerfile_option = context["dockerfile_option"]
     extra_packages = context["extra_packages"]
+    use_devcontainer = context["use_devcontainer"]
 
     assert project_path.is_dir()
     assert (project_path / ".git/HEAD").is_file()
+
+    if use_devcontainer == "Yes":
+        assert (project_path / ".devcontainer").is_dir()
+        assert (project_path / "devcontainer.json").is_file()
+    else:
+        assert not (project_path / ".devcontainer").is_dir()
 
     if dockerfile_option == "None":
         assert not (project_path / "Dockerfile").is_file()
@@ -102,35 +106,51 @@ def check_project_structure(project_path, context):
         assert (project_path / "migrations").is_dir()
 
 
-def enumerate_features(keys):
+def is_valid_test_scenario(context) -> bool:
+    dockerfile_option = context["dockerfile_option"]
+    extra_packages = context["extra_packages"]
+    use_devcontainer = context["use_devcontainer"]
+
+    if extra_packages == "None":
+        return True
+    elif extra_packages != "None" and use_devcontainer != "Yes" and dockerfile_option == "None":
+        return True
+
+    return False
+
+
+def scenario_id(context) -> str:
+    dockerfile_option = context["dockerfile_option"].replace(" ", "_")[:20]
+    extra_packages = context["extra_packages"].replace(" ", "_")[:20]
+    use_devcontainer = "devcontainer" if context["use_devcontainer"] == "Yes" else "no"
+    return f"{use_devcontainer}_{dockerfile_option}_{extra_packages}"
+
+
+def enumerate_test_scenarios() -> dict[str, dict[str, Any]]:
     """
     read parameters from cookiecutter.json and generate all possible combinations
-    return the list of dict after filtering out invalid entries
+    filter out the combination that should not be tested
+    then return a dict with key as the test id and value is context for generation
     """
     ctx_file = os.path.dirname(os.path.abspath(__file__)) + "/../cookiecutter.json"
+
+    keys = ["extra_packages", "use_devcontainer", "dockerfile_option"]
 
     with open(ctx_file) as f:
         ctx = json.load(f)
         param_lists = [ctx[key] for key in keys]
         all_entries = [dict(zip(keys, val)) for val in itertools.product(*param_lists)]
-        return all_entries
-
-
-def feature_id(extra_packages):
-    key = extra_packages.replace(" ", "_").lower()
-    return f"extra_{key}"
+        return {scenario_id(entry): entry for entry in all_entries if is_valid_test_scenario(entry)}
 
 
 def pytest_generate_tests(metafunc):
     """dynamically generate test cases based on content of cookiecutter.json"""
     if "generator_ctx" in metafunc.fixturenames:
-        keys = ["extra_packages"]
-        features_to_test = enumerate_features(keys)
-
+        scenarios = enumerate_test_scenarios()
         metafunc.parametrize(
             "generator_ctx",
-            features_to_test,
-            ids=[feature_id(**kw) for kw in features_to_test],
+            scenarios.values(),
+            ids=scenarios.keys(),
         )
 
 
