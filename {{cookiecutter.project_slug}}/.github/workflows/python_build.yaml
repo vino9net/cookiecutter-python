@@ -52,7 +52,7 @@ jobs:
 
     - name: Linting
       run: |
-        ruff run check .
+        ruff check .
 
     - name: Unit tests
       id: unit_tests
