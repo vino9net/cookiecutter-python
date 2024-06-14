@@ -23,6 +23,7 @@ if dockerfile_option == "None":
     shutil.rmtree(".github")
     os.unlink("Dockerfile")
     os.unlink(".dockerignore")
+    os.unlink("entrypoint.sh")
 elif dockerfile_option == "Dockerfile only":
     shutil.rmtree(".github")
 else:

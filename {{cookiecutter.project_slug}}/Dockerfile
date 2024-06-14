@@ -28,4 +28,8 @@ COPY --chown=app:app --from=builder /app/venv /app/venv
 COPY --chown=app:app . .
 
 ENV PATH="/app/venv/bin:$PATH"
-CMD  ["/bin/sleep", "100000"]
+CMD  ["/bin/sh", "/entrypoint.sh"]
+
+{% if "django" in cookiecutter.extra_packages -%}
+EXPOSE 8000
+{% endif %}

@@ -120,9 +120,16 @@ def is_valid_test_scenario(context) -> bool:
 
 
 def scenario_id(context) -> str:
-    dockerfile_option = context["dockerfile_option"].replace(" ", "_")[:20]
-    extra_packages = context["extra_packages"].replace(" ", "_")[:20]
-    use_devcontainer = "devcontainer" if context["use_devcontainer"] == "Yes" else "no"
+    val = context["dockerfile_option"].lower()
+    if val == "none":
+        dockerfile_option = "nodocker"
+    elif "github" in val:
+        dockerfile_option = "github"
+    else:
+        dockerfile_option = "dockerfile"
+
+    extra_packages = context["extra_packages"].split(" ")[0][:20].lower()
+    use_devcontainer = "devcontainer" if context["use_devcontainer"] == "Yes" else "nocontainer"
     return f"{use_devcontainer}_{dockerfile_option}_{extra_packages}"
 
 

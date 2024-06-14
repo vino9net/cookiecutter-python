@@ -14,7 +14,8 @@
   ],
   "extra_packages": [
     "None",
-    "Install sqlalchemy and alembic with postgresql driver"
+    "django",
+    "sqlalchemy and alembic with postgresql driver"
   ],
   "version": "0.1.0",
   "_copy_without_render": [

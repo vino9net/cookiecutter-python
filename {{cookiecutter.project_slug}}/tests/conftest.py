@@ -12,7 +12,14 @@ from sqlalchemy_utils import create_database, database_exists, drop_database
 
 logger = logging.getLogger(__name__)
 
+{% elif "django" in cookiecutter.extra_packages %}
+import pytest
+
+from django.conf import settings
+from django.core.management import call_command
+
 {% endif %}
+
 cwd = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(f"{cwd}/.."))
 
@@ -71,4 +78,13 @@ def seed_data(session):
     root = User(login_name="root")
     session.add(root)
     session.commit()
+{% elif "django" in cookiecutter.extra_packages %}
+
+@pytest.fixture(scope="session")
+def django_db_setup(django_db_setup, django_db_blocker):
+    # in memory db are empty upon start, run schema migrate
+    with django_db_blocker.unblock():
+        call_command("migrate", interactive=False)
+        # load test data if needed
+        # seed_data()
 {% endif %}
