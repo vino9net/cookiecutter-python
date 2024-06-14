@@ -7,6 +7,8 @@ import shlex
 import subprocess
 from typing import Any
 
+import pytest
+
 
 def run_pytest_in_generated_project(project_path):
     if not os.path.isdir(project_path):
@@ -179,3 +181,18 @@ def test_generate_and_build(cookies, generator_ctx):
     run_pytest_in_generated_project(result.project_path)
     run_linting_in_generated_project(result.project_path)
     run_precommit_in_generated_project(result.project_path)
+
+
+@pytest.mark.skip(reason="local test only")
+def test_local_generate(cookies):
+    """used to test locally"""
+    result = cookies.bake(
+        extra_context={
+            "project_name": "My Local Project",
+            "use_devcontainer": "No",
+            "dockerfile_option": "Dockerfile with Github workflow",
+            "extra_packages": "sqlalchemy and alembic with postgresql driver",
+        }
+    )
+    print(result.project_path)
+    assert result.project_path

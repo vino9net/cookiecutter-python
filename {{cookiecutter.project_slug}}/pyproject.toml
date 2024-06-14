@@ -7,19 +7,19 @@ readme = "README.md"
 requires-python = ">= 3.12"
 dependencies = [
     "python-dotenv >= 1.0.0",
-{% if "sqlalchemy" in cookiecutter.extra_packages -%}
+{%- if "sqlalchemy" in cookiecutter.extra_packages %}
     "sqlalchemy[mypy] >= 2.0.23",
     "sqlalchemy-utils >= 0.41.1",
     "alembic >= 1.13.0",
     "psycopg[binary, pool] >= 3.1.19",
-{% elif "django" in cookiecutter.extra_packages -%}
+{%- elif "django" in cookiecutter.extra_packages %}
     "django>=5.0.6",
     "django-ninja>=1.1.0",
     "gunicorn>=22.0.0",
     "dj-database-url>=2.2.0",
     "django-extensions>=3.2.3",
     "psycopg[binary,pool]>=3.1.19",
-{% endif -%}
+{%- endif %}
 ]
 
 [tool.rye]
@@ -30,10 +30,10 @@ dev-dependencies = [
     "pytest-dotenv >= 0.5.2",
     "pytest-mock >= 3.14",
     "pytest-cov >= 4.1",
-{% if "django" in cookiecutter.extra_packages -%}
+{%- if "django" in cookiecutter.extra_packages %}
     "pytest-django>=4.8.0",
     "django-stubs[compatible-mypy]>=5.0.2",
-{% endif -%}
+{%- endif %}
     "pre-commit >= 3.7.1",
     "ruff >= 0.4.8",
     "mypy >= 1.10.0",
@@ -44,11 +44,14 @@ pre = "pre-commit run --all-files"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-{% if "django" in cookiecutter.extra_packages -%}
+{%- if "django" in cookiecutter.extra_packages %}
 addopts = "--reuse-db"
 DJANGO_SETTINGS_MODULE="proj.settings"
-{% endif -%}
+{%- endif %}
 testpaths = ["tests"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
 
 [tool.coverage.run]
 source = ["."]
@@ -74,11 +77,11 @@ select = [
 ignore = ["E203", "E266"]
 
 [tool.mypy]
-{% if "sqlalchemy" in cookiecutter.extra_packages %}
+{% if "sqlalchemy" in cookiecutter.extra_packages -%}
 plugins = ["sqlalchemy.ext.mypy.plugin"]
-{% elif "django" in cookiecutter.extra_packages %}
+{% elif "django" in cookiecutter.extra_packages -%}
 plugins = ["mypy_django_plugin.main"]
-{% endif %}
+{% endif -%}
 warn_return_any = false
 warn_unused_configs = true
 no_implicit_optional = true
@@ -89,16 +92,16 @@ show_error_codes = true
 show_error_context = true
 mypy_path = "."
 
-{% if "django" in cookiecutter.extra_packages %}
+{% if "django" in cookiecutter.extra_packages -%}
 [tool.django-stubs]
-django_settings_module = "core_sim.settings"
+django_settings_module = "myproj.settings"
 {% endif %}
 
 [[tool.mypy.overrides]]
 module = [
     "dataclasses",
-{% if "sqlalchemy" in cookiecutter.extra_packages %}
+{%- if "sqlalchemy" in cookiecutter.extra_packages %}
     "sqlalchemy_utils",
-{% endif %}
+{%- endif %}
 ]
 ignore_missing_imports = true
