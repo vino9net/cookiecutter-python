@@ -1,5 +1,7 @@
 #!/bin/sh
 
+cd "$(dirname "$0")"
+
 {% if "django" in cookiecutter.extra_packages -%}
 
 if [ "$DATABASE_URL" = "" ]; then
