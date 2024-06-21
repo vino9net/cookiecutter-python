@@ -52,6 +52,7 @@ testpaths = ["tests"]
 filterwarnings = [
     "ignore::DeprecationWarning",
 ]
+env_files = [".env"]
 
 [tool.coverage.run]
 source = ["."]
