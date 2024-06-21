@@ -1,11 +1,13 @@
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import (
+    DeclarativeBase,
     Mapped,
-    declarative_base,
     mapped_column,
 )
 
-Base = declarative_base()
+# use this as Base in order to pass mypy checks
+class Base(DeclarativeBase):
+     pass
 
 
 class User(Base):
