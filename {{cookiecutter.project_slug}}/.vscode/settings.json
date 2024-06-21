@@ -13,7 +13,7 @@
         },
         "editor.defaultFormatter": "charliermarsh.ruff"
     },
-    "mypy-type-checker.preferDaemon": true,
     "jupyter.debugJustMyCode": false,
     "python.analysis.typeCheckingMode": "standard",
+    "debugpy.debugJustMyCode": false,
 }
