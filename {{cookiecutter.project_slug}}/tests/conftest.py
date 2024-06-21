@@ -36,7 +36,9 @@ def tmp_sqlite_url():
 
 
 test_db_url = os.environ.get("TEST_DATABASE_URI", tmp_sqlite_url())
-testing_sql_engine = create_engine(test_db_url, connect_args={"check_same_thread": False}, echo=False)
+if test_db_url.startswith("sqlite"):
+    db_args = {"check_same_thread": False}
+testing_sql_engine = create_engine(test_db_url, connect_args=db_args, echo=False)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=testing_sql_engine)
 
 
