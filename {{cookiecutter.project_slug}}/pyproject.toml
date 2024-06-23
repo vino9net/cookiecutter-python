@@ -8,17 +8,21 @@ requires-python = ">= 3.12"
 dependencies = [
     "python-dotenv >= 1.0.0",
 {%- if "sqlalchemy" in cookiecutter.extra_packages %}
-    "sqlalchemy[mypy] >= 2.0.23",
-    "sqlalchemy-utils >= 0.41.1",
     "alembic >= 1.13.0",
-    "psycopg[binary, pool] >= 3.1.19",
+    "fastapi>=0.111.0",
+    "newrelic>=9.11.0",
+    "uvicorn>=0.30.1",
+    "ulid-py>=1.1.0",
+    "sqlalchemy[postgresql_asyncpg,mypy]>=2.0.31",
+    "psycopg[binary]>=3.1.19",
+    "aiosqlite>=0.20.0",
 {%- elif "django" in cookiecutter.extra_packages %}
     "django>=5.0.6",
     "django-ninja>=1.1.0",
     "gunicorn>=22.0.0",
     "dj-database-url>=2.2.0",
     "django-extensions>=3.2.3",
-    "psycopg[binary,pool]>=3.1.19",
+    "psycopg[binary]>=3.1.19",
 {%- endif %}
 ]
 
@@ -30,7 +34,10 @@ dev-dependencies = [
     "pytest-dotenv >= 0.5.2",
     "pytest-mock >= 3.14",
     "pytest-cov >= 4.1",
-{%- if "django" in cookiecutter.extra_packages %}
+{%- if "sqlalchemy" in cookiecutter.extra_packages %}
+    "pytest-asyncio>=0.23.7",
+    "sqlalchemy-utils >= 0.41.1",
+{%- elif "django" in cookiecutter.extra_packages %}
     "pytest-django>=4.8.0",
     "django-stubs[compatible-mypy]>=5.0.2",
 {%- endif %}
@@ -53,6 +60,7 @@ filterwarnings = [
     "ignore::DeprecationWarning",
 ]
 env_files = [".env"]
+asyncio_mode = "auto"
 
 [tool.coverage.run]
 source = ["."]

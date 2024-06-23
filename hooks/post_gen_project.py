@@ -47,6 +47,8 @@ if "sqlalchemy" not in extra_packages:
     os.unlink(f"{pkg_name}/models.py")
     os.unlink("tests/test_models.py")
     os.unlink("alembic.ini")
+    os.unlink("main.py")
+    os.unlink("database.py")
     shutil.rmtree("migrations")
 
 # create a git repo, everybody needs this, right?

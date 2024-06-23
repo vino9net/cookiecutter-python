@@ -14,7 +14,9 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-url = os.getenv("SQLALCHEMY_DATABASE_URI", "")
+url = os.getenv("ALEMBIC_DATABASE_URI")
+if not url:
+    url = os.getenv("SQLALCHEMY_DATABASE_URI")
 config.set_main_option("sqlalchemy.url", url)
 
 target_metadata = Base.metadata

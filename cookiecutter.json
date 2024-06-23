@@ -15,7 +15,7 @@
   "extra_packages": [
     "None",
     "django",
-    "sqlalchemy and alembic with postgresql driver"
+    "fastpi sqlalchemy alembic postgresql"
   ],
   "version": "0.1.0",
   "_copy_without_render": [
