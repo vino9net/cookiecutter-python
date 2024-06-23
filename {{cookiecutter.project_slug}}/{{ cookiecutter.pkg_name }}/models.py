@@ -5,6 +5,7 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 
+
 # use this as Base in order to pass mypy checks
 class Base(DeclarativeBase):
      pass

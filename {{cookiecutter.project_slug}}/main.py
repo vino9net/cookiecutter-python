@@ -3,6 +3,7 @@ from typing import Iterator, AsyncIterator
 import uvicorn
 from fastapi import FastAPI, Depends
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 from {{ cookiecutter.pkg_name }} import models
 

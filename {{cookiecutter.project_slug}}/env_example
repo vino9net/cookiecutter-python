@@ -3,6 +3,7 @@
 # OPTIONAL: when not set, SQLALCHEMY_DATABASE_URI will be used
 #           this is required when the app uses async database driver, i.e. asyncpg,
 #           because Alembic does not support async drivers
+#
 # ALEMBIC_DATABASE_URI=postgresql+psycopg://username:password@server:port/database
 
 # REQUIRED: main database connection

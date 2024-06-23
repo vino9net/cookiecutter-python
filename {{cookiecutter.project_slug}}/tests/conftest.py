@@ -5,7 +5,7 @@ import sys
 import pytest
 import asyncio
 import logging
-from typing import AsyncIterator
+from typing import AsyncIterator, Iterator
 
 from alembic import command
 from alembic.config import Config
@@ -96,42 +96,7 @@ def prep_new_test_db(test_db_url: str) -> tuple[bool, str]:
 # test database setup for app
 # modelled after database.py in the app
 test_db_url = os.environ.get("TEST_DATABASE_URI", tmp_sqlite_url())
-conn_args = {"check_same_thread": False} if test_db_url.startswith("sqlite") else {}
 
-# sync mode setup, uncomment async version below if needed
-testing_sql_engine = create_engine(test_db_url, connect_args=conn_args, echo=False)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=testing_sql_engine)
-
-
-# Testing Dependency
-def testing_db_session():
-    session = TestingSessionLocal()
-    try:
-        yield session
-    finally:
-        session.close()
-
-
-# uncomment if using async api endpoints
-# async_testing_sql_engine = create_async_engine(test_db_url, echo=False)
-# AsyncTestingSessionLocal = async_sessionmaker(
-#     expire_on_commit=False,
-#     class_=AsyncSession,
-#     bind=async_testing_sql_engine,
-# )
-
-
-# uncomment if using async api endpoints
-# async def testing_db_session() -> AsyncIterator[AsyncSession]:
-#     async with AsyncTestingSessionLocal() as session:
-#         yield session
-
-
-# overrides default dependency injection for testing
-app.dependency_overrides[db_session] = testing_db_session
-
-
-# text fixtures
 @pytest.fixture(autouse=True, scope="session")
 def test_db():
     """
@@ -151,34 +116,72 @@ def test_db():
         logger.info(f"dropping test database {sync_db_url}")
         drop_database(sync_db_url)
 
+#
+# begin of sync db setup, remove if async version is used
+#
+conn_args = {"check_same_thread": False} if test_db_url.startswith("sqlite") else {}
+testing_sql_engine = create_engine(test_db_url, connect_args=conn_args, echo=False)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=testing_sql_engine)
 
-# uncomment if using async api endpoints
-# # in pytest-asyncio the default event loop is function scoped
-# # which causes problem with asyncpg
-# @pytest.fixture(scope="session")
-# def event_loop():
-#     loop = asyncio.get_event_loop_policy().new_event_loop()
-#     yield loop
-#     loop.close()
 
-# uncomment if using async api endpoints
-# @pytest.fixture()
-# async def session():
-#     async with AsyncTestingSessionLocal() as session:
-#         yield session
+def testing_db_session() -> Iterator[Session]:
+    session = TestingSessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
 
 @pytest.fixture(scope="session")
 def session():
     with TestingSessionLocal() as session:
         yield session
 
-# uncomment if using async api endpoints
+# end of sync db setup
+
+
+
+#
+# begin of async db setup, uncomment if needed and remove sync setup above
+#
+
+# async_testing_sql_engine = create_async_engine(test_db_url, echo=False)
+# AsyncTestingSessionLocal = async_sessionmaker(
+#     expire_on_commit=False,
+#     class_=AsyncSession,
+#     bind=async_testing_sql_engine,
+# )
+
+
+# async def testing_db_session() -> AsyncIterator[AsyncSession]:
+#     async with AsyncTestingSessionLocal() as session:
+#         yield session
+
+# @pytest.fixture(scope="session")
+# def event_loop():
+#     """"
+#     session scoped event_loop.
+#     in pytest-asyncio the default event loop is function scoped
+#     which causes problem with asyncpg
+#     """"
+#     loop = asyncio.get_event_loop_policy().new_event_loop()
+#     yield loop
+#     loop.close()
+#
+# @pytest.fixture()
+# async def session():
+#     async with AsyncTestingSessionLocal() as session:
+#         yield session
+#
+#
 # @pytest.fixture(scope="session")
 # async def client():
 #     async with AsyncClient(app=app, base_url="http://localhost:8000") as client:
 #         yield client
+#
+# end of async db setup
 
-
+# overrides default dependency injection for testing
+app.dependency_overrides[db_session] = testing_db_session
 
 def seed_data(session):
     root = User(login_name="root")

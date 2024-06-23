@@ -10,11 +10,17 @@ __all__ = ["SessionLocal", "engine"]
 load_dotenv()
 
 db_url = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///memory:")
+
+#
+# begin of sync db setup, remove and uncomment async setup below if needed
+#
 conn_args = {"check_same_thread": False} if db_url.startswith("sqlite") else {}
 
 engine = create_engine(db_url, connect_args=conn_args, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# uncomment below for async setup
+#
+# begin of async db setup, uncomment and remove sync setup above if needed
+#
 # engine = create_async_engine(db_url, echo=False)
 # SessionLocal = async_sessionmaker(bind=engine, autoflush=False, future=True)
