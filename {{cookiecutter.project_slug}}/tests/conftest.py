@@ -46,7 +46,9 @@ def is_env_true(var_name: str) -> bool:
 def tmp_sqlite_url():
     tmp_path = os.path.abspath(f"{cwd}/../tmp")
     os.makedirs(tmp_path, exist_ok=True)
-    return f"sqlite+aiosqlite:///{tmp_path}/test.db"
+    return f"sqlite:///{tmp_path}/test.db"
+    # uncomment the below for async setup
+    # return f"sqlite+aiosqlite:///{tmp_path}/test.db"
 
 
 def async2sync_database_uri(database_uri: str) -> str:

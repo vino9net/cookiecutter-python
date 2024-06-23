@@ -9,7 +9,7 @@ from {{ cookiecutter.pkg_name }} import models
 from database import SessionLocal
 
 # Dependency
-def db_session() -> Iterator[Session]::
+def db_session() -> Iterator[Session]:
     with SessionLocal() as session:
         yield session
 
