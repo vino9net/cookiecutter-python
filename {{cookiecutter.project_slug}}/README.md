@@ -21,23 +21,31 @@ rye sync
 
 ```
 
-## Develop the code for the stack
+## Notes for FastApi - SqlAlchemy options
+When selected, a project skeleton of web application with FastApi with SqlAlchmey will be generated, as long with PostgreSQL driver and related setup. The template supports PostgreSQL and SQLite. Other
+database supports can be added easiy. Some modification to ```tests/conftest.py``` might be needed.
 
 ```shell
 
-# update your DATABASE_URL is used
 # create database and assign proper privileges to the user
 # e.g.
 # create database mydb;
 # grant all privileges on database mydb to me;
 
+# 1. create a .env file with database related setting
+#    and edit content. the template supports PostgreSQL and SQLite.
+cp env_example .env
 nano .env
 
-# run alembic migration
 alembic upgrade head
 
 # run unit tests
-pytest
+pytest -s -v
+
+# the generated code uses sync database drivers. If async support is desirted
+# please open ```database.py```, ```tests/conftest.py``` and ```main.py```
+# remove the sync db setup code and uncomment the async setup
+
 
 ```
 
