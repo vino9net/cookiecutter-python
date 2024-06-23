@@ -14,6 +14,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
+from fastapi.testclient import TestClient
 
 cwd = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(f"{cwd}/.."))
@@ -93,8 +94,6 @@ def prep_new_test_db(test_db_url: str) -> tuple[bool, str]:
     return True, db_url
 
 
-# test database setup for app
-# modelled after database.py in the app
 test_db_url = os.environ.get("TEST_DATABASE_URI", tmp_sqlite_url())
 
 @pytest.fixture(autouse=True, scope="session")
@@ -136,6 +135,11 @@ def session():
     with TestingSessionLocal() as session:
         yield session
 
+@pytest.fixture(scope="session")
+def client():
+    client = TestClient(app)
+    yield client
+
 # end of sync db setup
 
 
@@ -158,11 +162,11 @@ def session():
 
 # @pytest.fixture(scope="session")
 # def event_loop():
-#     """"
+#     """
 #     session scoped event_loop.
 #     in pytest-asyncio the default event loop is function scoped
 #     which causes problem with asyncpg
-#     """"
+#     """
 #     loop = asyncio.get_event_loop_policy().new_event_loop()
 #     yield loop
 #     loop.close()

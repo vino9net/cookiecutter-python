@@ -9,12 +9,16 @@ from {{ cookiecutter.pkg_name }} import models
 
 from database import SessionLocal
 
-# Dependency
+#
+# begin of sync db setup, remove and uncomment async setup below if needed
+#
 def db_session() -> Iterator[Session]:
     with SessionLocal() as session:
         yield session
 
-# uncomment below for async version
+#
+# begin of async db setup, uncomment and remove sync setup above if needed
+#
 # async def db_session() -> AsyncIterator[AsyncSession]:
 #     async with SessionLocal() as session:
 #         yield session
