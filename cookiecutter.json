@@ -3,19 +3,23 @@
   "project_slug": "{{ cookiecutter.project_name|lower|replace(' ', '-') }}",
   "pkg_name": "{{ cookiecutter.project_slug|replace('-', '_') }}",
   "project_short_description": "Generic Python3 project",
+  "project_type": [
+    "app",
+    "lib"
+  ],
   "use_devcontainer": [
     "No",
     "Yes"
   ],
   "dockerfile_option": [
     "Dockerfile only",
-    "Dockerfile with Github workflow",
+    "Build container with Github action",
     "None"
   ],
   "extra_packages": [
     "None",
-    "django",
-    "fastpi sqlalchemy alembic postgresql"
+    "fastapi",
+    "fastapi sqlmodel alembic"
   ],
   "version": "0.1.0",
   "_copy_without_render": [

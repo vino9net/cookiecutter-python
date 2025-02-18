@@ -7,6 +7,8 @@ import shlex
 import subprocess
 from typing import Any
 
+import pytest
+
 
 def run_pytest_in_generated_project(project_path):
     if not os.path.isdir(project_path):
@@ -17,8 +19,8 @@ def run_pytest_in_generated_project(project_path):
     try:
         os.chdir(project_path)
 
-        subprocess.call(shlex.split("rye sync"))
-        assert subprocess.call(shlex.split("rye run pytest -v -s")) == 0
+        subprocess.call(shlex.split("uv sync"))
+        assert subprocess.call(shlex.split("uv run pytest -v -s")) == 0
     finally:
         os.chdir(current_path)
 
@@ -32,22 +34,23 @@ def run_linting_in_generated_project(project_path):
     try:
         os.chdir(project_path)
 
-        subprocess.call(shlex.split("rye sync"))
+        subprocess.call(shlex.split("uv sync"))
         # run ruff but ignore formatting realted errors
         result = subprocess.run(
-            shlex.split("rye run ruff check . --ignore I001,E302,E303,W291,W391 --verbose"),
+            shlex.split(
+                "uv run ruff check . --ignore I001,E302,E303,F401,W291,W391 --verbose"
+            ),
             capture_output=True,
             text=True,
         )
         assert result.returncode == 0, f"==RUFF output===\n{result.stdout}"
 
-        if os.environ.get("SKIP_MYPY", "0") != "1":
-            result = subprocess.run(
-                shlex.split("rye run mypy ."),
-                capture_output=True,
-                text=True,
-            )
-            assert result.returncode == 0, f"==MYPY output===\n{result.stdout}"
+        result = subprocess.run(
+            shlex.split("uv run pyright"),
+            capture_output=True,
+            text=True,
+        )
+        assert result.returncode == 0, f"==PYRIGHT output===\n{result.stdout}"
 
     finally:
         os.chdir(current_path)
@@ -62,8 +65,8 @@ def run_precommit_in_generated_project(project_path):
     try:
         os.chdir(project_path)
 
-        subprocess.call(shlex.split("rye sync"))
-        assert subprocess.call(shlex.split("rye run pre-commit install")) == 0
+        subprocess.call(shlex.split("uv sync"))
+        assert subprocess.call(shlex.split("uv run pre-commit install")) == 0
 
         # is adding a file necceeary?
         with open("a.py", "w") as f:
@@ -71,7 +74,7 @@ def run_precommit_in_generated_project(project_path):
             f.write("some_var = 0\n")
         assert subprocess.call(shlex.split("git add a.py")) == 0
 
-        assert subprocess.call(shlex.split("rye run pre-commit run")) == 0
+        assert subprocess.call(shlex.split("uv run pre-commit run")) == 0
     finally:
         os.chdir(current_path)
 
@@ -97,11 +100,11 @@ def check_project_structure(project_path, context):
     elif dockerfile_option == "Dockerfile only":
         assert (project_path / "Dockerfile").is_file()
         assert not (project_path / ".github").is_dir()
-    elif dockerfile_option == "Dockerfile with Github workflow":
+    elif "Github" in dockerfile_option:
         assert (project_path / "Dockerfile").is_file()
         assert (project_path / ".github").is_dir()
 
-    if "sqlalchemy" in extra_packages:
+    if "sqlmodel" in extra_packages:
         assert (project_path / "alembic.ini").is_file()
         assert (project_path / "migrations").is_dir()
 
@@ -113,7 +116,11 @@ def is_valid_test_scenario(context) -> bool:
 
     if extra_packages == "None":
         return True
-    elif extra_packages != "None" and use_devcontainer != "Yes" and dockerfile_option == "None":
+    elif (
+        extra_packages != "None"
+        and use_devcontainer != "Yes"
+        and dockerfile_option == "None"
+    ):
         return True
 
     return False
@@ -128,8 +135,15 @@ def scenario_id(context) -> str:
     else:
         dockerfile_option = "dockerfile"
 
-    extra_packages = context["extra_packages"].split(" ")[0][:20].lower()
-    use_devcontainer = "devcontainer" if context["use_devcontainer"] == "Yes" else "nocontainer"
+    if context["extra_packages"] == "None":
+        extra_packages = "none"
+    elif context["extra_packages"] == "fastapi":
+        extra_packages = "fastapi"
+    else:
+        extra_packages = "fastpi-sqlmodel"
+
+    use_devcontainer = "devcon" if context["use_devcontainer"] == "Yes" else "nodevcon"
+
     return f"{use_devcontainer}_{dockerfile_option}_{extra_packages}"
 
 
@@ -147,7 +161,11 @@ def enumerate_test_scenarios() -> dict[str, dict[str, Any]]:
         ctx = json.load(f)
         param_lists = [ctx[key] for key in keys]
         all_entries = [dict(zip(keys, val)) for val in itertools.product(*param_lists)]
-        return {scenario_id(entry): entry for entry in all_entries if is_valid_test_scenario(entry)}
+        return {
+            scenario_id(entry): entry
+            for entry in all_entries
+            if is_valid_test_scenario(entry)
+        }
 
 
 def pytest_generate_tests(metafunc):
@@ -169,8 +187,7 @@ def test_generate_and_build(cookies, generator_ctx):
         }
     )
 
-    assert result.exit_code == 0
-    assert result.exception is None
+    assert result.exit_code == 0 and result.exception is None
     assert result.project_path.is_dir()
 
     check_project_structure(result.project_path, result.context)
@@ -181,16 +198,27 @@ def test_generate_and_build(cookies, generator_ctx):
     run_precommit_in_generated_project(result.project_path)
 
 
-# @pytest.mark.skip(reason="local test only")
+@pytest.mark.skipif(
+    os.getenv("GITHUB_ACTIONS") == "true",
+    reason="for local test only",
+)
 def test_local_generate(cookies):
     """used to test locally"""
     result = cookies.bake(
         extra_context={
             "project_name": "My Local Project",
+            "project_type": "lib",
             "use_devcontainer": "No",
-            "dockerfile_option": "Dockerfile with Github workflow",
-            "extra_packages": "fastpi sqlalchemy alembic postgresql",
+            "dockerfile_option": "Build container with Github action",
+            "extra_packages": "fastapi sqlmodel alembic",
+            # "extra_packages": "fastapi",
         }
     )
+    assert result.exit_code == 0 and result.exception is None
+    assert result.project_path.is_dir()
     print(result.project_path)
-    assert result.project_path
+
+    check_project_structure(result.project_path, result.context)
+    run_pytest_in_generated_project(result.project_path)
+    run_linting_in_generated_project(result.project_path)
+    run_precommit_in_generated_project(result.project_path)

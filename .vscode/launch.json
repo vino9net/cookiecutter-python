@@ -5,11 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Module",
-            "type": "python",
+            "name": "Python: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "pytest",
+            "type": "debugpy",
             "request": "launch",
             "module": "pytest",
-            "justMyCode": true,
+            "justMyCode": false,
             "args": [
                 "-k",
                 "test_default_project",

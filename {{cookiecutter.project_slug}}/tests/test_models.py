@@ -1,5 +1,4 @@
 from sqlalchemy import select
-
 from {{ cookiecutter.pkg_name }}.models import User
 
 def test_query_models(session):

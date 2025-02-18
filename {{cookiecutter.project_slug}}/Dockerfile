@@ -12,7 +12,7 @@ RUN apt-get update \
 RUN python -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
 COPY requirements.lock .
-RUN pip install --no-cache-dir -r requirements.lock
+RUN pip install --no-cache-dir -r requirements.txt
 
 # stage 2: runtime
 FROM python:3.12-slim-bookworm
@@ -30,6 +30,6 @@ COPY --chown=app:app . .
 ENV PATH="/app/venv/bin:$PATH"
 CMD  ["/bin/sh", "/app/entrypoint.sh"]
 
-{% if "django" in cookiecutter.extra_packages -%}
+{% if "fastapi" in cookiecutter.extra_packages -%}
 EXPOSE 8000
-{% endif %}
+{% endif -%}

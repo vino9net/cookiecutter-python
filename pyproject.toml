@@ -1,43 +1,52 @@
 [project]
-name = "cookiecutter-python"
-version = "0.2.0"
-description = "Cookiecutter template for generic Python 3 project with tooling configuration for testing, linting and IDE support"
+name = "vino9-python-template"
+version = "0.1.0"
+description = "Copier template for generic Python 3 project with tooling configuration for testing, linting and IDE support"
 authors = [{ name = "Li Lin", email = "guru.lin@gmail.com" }]
 readme = "README.md"
 requires-python = ">= 3.12"
-dependencies = []
-
-[tool.rye]
-managed = true
-virtual = true
-dev-dependencies = [
-    "pytest >= 7.4.0",
-    "pytest-cookies >= 0.7.0",
-    "pre-commit >= 3.7.1",
-    "ruff >= 0.4.8",
+dependencies = [
+    "cookiecutter>=2.6.0",
+    "python-dotenv >= 1.0.1",
 ]
 
-[tool.rye.scripts]
-pre = "pre-commit run --all-files"
+
+[dependency-groups]
+dev = [
+    "pytest >= 8.3.0",
+    "pytest-dotenv >= 0.5.2",
+    "pytest-mock >= 3.14",
+    "pre-commit >= 4.0.1",
+    "ruff >= 0.9.2",
+    "pyright >= 1.1.392.post0",
+    "pytest-cookies>=0.7.0",
+]
+
+[tool.uv]
+managed = true
 
 [tool.pytest.ini_options]
 minversion = "6.0"
 testpaths = ["tests"]
-filterwarnings = ["ignore::DeprecationWarning"]
+pythonpath = ["."]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+env_files = [".env"]
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "tests/*",
+]
 
 # see ruff configuration options at
 # https://docs.astral.sh/ruff/configuration/
 
 [tool.ruff]
-line-length = 120
+line-length = 90
 indent-width = 4
-exclude = [
-    ".git",
-    "__pycache__",
-    "venv",
-    ".venv",
-    "*cookiecutter.project_slug*",
-]
+exclude = [".git", "__pycache__", "venv", ".venv", "\\{\\{*\\}\\}"]
 
 [tool.ruff.lint]
 select = [
@@ -49,17 +58,3 @@ select = [
     "A",
 ] # Enable checks for PEP8, imports, and other standard rules
 ignore = ["E203", "E266"]
-
-[tool.mypy]
-follow_imports = "silent"
-warn_return_any = false
-warn_unused_configs = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-show_column_numbers = true
-show_error_codes = true
-show_error_context = true
-no_implicit_optional = true
-no_implicit_reexport = true
-namespace_packages = true
-mypy_path = "."
