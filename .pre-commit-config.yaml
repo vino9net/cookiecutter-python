@@ -2,23 +2,34 @@ exclude: "^$|deploy|scripts|tmp|{{cookiecutter.project_slug}}"
 fail_fast: false
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
       - id: check-merge-conflict
       - id: end-of-file-fixer
-        exclude: ^requirements.*\.lock$
       - id: check-toml
       # - id: debug-statements
       #   args: ["--print-changes"]
 
+  - repo: local
+    hooks:
+      - id: update-uv-lock
+        name: ensure uv.lock is up-to-date
+        entry: bash -c 'uv lock && git diff --exit-code uv.lock > /dev/null'
+        language: system
+        files: ^uv\.lock$
+        pass_filenames: false
+
+      - id: pyright
+        name: pyright
+        entry: bash -c 'uv run pyright'
+        language: system
+        types: [python]
+        pass_filenames: false
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.8
+    rev: v0.8.2
     hooks:
       - id: ruff
-        name: Ruff check
-        description: "Run 'ruff check' for extremely fast Python linting"
-        args: [ --fix ]
+        args: [--fix]
 
       - id: ruff-format
-        name: Ruff format
-        description: "Run 'ruff format' for extremely fast Python formatting"

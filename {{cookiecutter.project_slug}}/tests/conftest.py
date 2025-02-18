@@ -1,10 +1,14 @@
 import os
 import sys
-
-{% if "sqlalchemy" in cookiecutter.extra_packages %}
 import pytest
-import asyncio
 import logging
+
+{% if "fastapi" in cookiecutter.extra_packages %}
+from fastapi.testclient import TestClient
+{% endif %}
+
+{% if "sqlmodel" in cookiecutter.extra_packages %}
+import asyncio
 from typing import AsyncIterator, Iterator
 
 from alembic import command
@@ -14,30 +18,16 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
-from fastapi.testclient import TestClient
-
-cwd = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(f"{cwd}/.."))
-
-# the following import only works after sys.path is updated
-from main import app, db_session  # noqa
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-{% elif "django" in cookiecutter.extra_packages %}
-import pytest
-
-from django.conf import settings
-from django.core.management import call_command
-
 {% endif %}
 
 cwd = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(f"{cwd}/.."))
 
-{% if "sqlalchemy" in cookiecutter.extra_packages %}
-from {{cookiecutter.pkg_name}}.models import User  # noqa: E402
+
+{% if "sqlmodel" in cookiecutter.extra_packages %}
+# the following import only works after sys.path is updated
+from main import app, db_session  # noqa: E402
+from {{cookiecutter.pkg_name}}.models import User # noqa: E402
 
 # helper functions
 def is_env_true(var_name: str) -> bool:
@@ -76,7 +66,7 @@ def prep_new_test_db(test_db_url: str) -> tuple[bool, str]:
     if database_exists(db_url):
         return False, ""
 
-    logger.info(f"creating test database {db_url}")
+    logging.info(f"creating test database {db_url}")
     create_database(db_url)
 
     # Run the migrations
@@ -88,7 +78,7 @@ def prep_new_test_db(test_db_url: str) -> tuple[bool, str]:
     # seed test data
     engine = create_engine(db_url)
     with sessionmaker(autocommit=False, autoflush=False, bind=engine)() as session:
-        logger.info("adding seed data")
+        logging.info("adding seed data")
         seed_data(session)
 
     return True, db_url
@@ -106,13 +96,14 @@ def test_db():
     """
     test_db_created, sync_db_url = prep_new_test_db(test_db_url)
 
-    # the yielded value is not used, but we need this structure to ensure the cleanup code runs
+    # the yielded value is not used, but we need this structure to
+    # ensure the cleanup code runs
     yield
 
     # only delete the test database if it was created during this test run
     # to avoid accidental deletion of potentially important data
     if test_db_created and not is_env_true("KEEP_TEST_DB"):
-        logger.info(f"dropping test database {sync_db_url}")
+        logging.info(f"dropping test database {sync_db_url}")
         drop_database(sync_db_url)
 
 #
@@ -120,7 +111,11 @@ def test_db():
 #
 conn_args = {"check_same_thread": False} if test_db_url.startswith("sqlite") else {}
 testing_sql_engine = create_engine(test_db_url, connect_args=conn_args, echo=False)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=testing_sql_engine)
+TestingSessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=testing_sql_engine,
+)
 
 
 def testing_db_session() -> Iterator[Session]:
@@ -191,13 +186,4 @@ def seed_data(session):
     root = User(login_name="root")
     session.add(root)
     session.commit()
-{% elif "django" in cookiecutter.extra_packages %}
-
-@pytest.fixture(scope="session")
-def django_db_setup(django_db_setup, django_db_blocker):
-    # in memory db are empty upon start, run schema migrate
-    with django_db_blocker.unblock():
-        call_command("migrate", interactive=False)
-        # load test data if needed
-        # seed_data()
 {% endif %}

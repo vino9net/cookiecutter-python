@@ -1,5 +1,5 @@
 {
-    "name": "python-rye",
+    "name": "python-uv",
     "image": "mcr.microsoft.com/devcontainers/base:bookworm",
     "customizations": {
         "vscode": {
@@ -9,11 +9,17 @@
                 "ms-python.debugpy",
                 "charliermarsh.ruff",
                 "yzhang.markdown-all-in-one"
-            ]
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python"
+            }
         }
     },
     "features": {
-        "ghcr.io/schlich/devcontainer-features/rye:1": {},
+        "node": {
+            "version": "lts"
+        },
+        "ghcr.io/va-h/devcontainers-features/uv:1": {}
     },
     "remoteUser": "vscode",
     "forwardPorts": [],
