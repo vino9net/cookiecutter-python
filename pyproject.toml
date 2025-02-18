@@ -1,5 +1,5 @@
 [project]
-name = "vino9-python-template"
+name = "vino-cookiecutter-python"
 version = "0.1.0"
 description = "Copier template for generic Python 3 project with tooling configuration for testing, linting and IDE support"
 authors = [{ name = "Li Lin", email = "guru.lin@gmail.com" }]
