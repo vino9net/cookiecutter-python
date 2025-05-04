@@ -1,18 +1,11 @@
-from sqlalchemy import Integer, String
-from sqlalchemy.orm import (
-    DeclarativeBase,
-    Mapped,
-    mapped_column,
-)
+from tortoise import fields
+from tortoise.models import Model
 
 
-# use this as Base in order to pass mypy checks
-class Base(DeclarativeBase):
-     pass
+class User(Model):
+    id = fields.IntField(pk=True)
+    login_name = fields.CharField(max_length=32)
+    alias = fields.CharField(max_length=32, default="007")
 
-
-class User(Base):
-    __tablename__ = "users"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)  # noqa: A003
-    login_name: Mapped[str] = mapped_column(String(32))
+    class Meta:
+        table = "users"

@@ -1,3 +1,4 @@
+import asyncio
 import os
 import sys
 import pytest
@@ -7,25 +8,12 @@ import logging
 from fastapi.testclient import TestClient
 {% endif %}
 
-{% if "sqlmodel" in cookiecutter.extra_packages %}
-import asyncio
-from typing import AsyncIterator, Iterator
-
-from alembic import command
-from alembic.config import Config
-from httpx import AsyncClient
-from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy_utils import create_database, database_exists, drop_database
+{% if "tortoise-orm" in cookiecutter.extra_packages %}
+from {{ cookiecutter.pkg_name }}.models import User
 {% endif %}
 
-cwd = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(f"{cwd}/.."))
-
-
 {% if "fastapi" in cookiecutter.extra_packages %}
-from main import app # noqa: E402
+from main import app
 
 @pytest.fixture(scope="session")
 def client():
@@ -33,162 +21,38 @@ def client():
     yield client
 {% endif %}
 
-
-{% if "sqlmodel" in cookiecutter.extra_packages %}
-# the following import only works after sys.path is updated
-from main import db_session  # noqa: E402
-from {{cookiecutter.pkg_name}}.models import User # noqa: E402
-
-# helper functions
-def is_env_true(var_name: str) -> bool:
-    return os.environ.get(var_name, "N").upper() in ["1", "Y", "YES", "TRUE"]
-
-
-def tmp_sqlite_url():
-    tmp_path = os.path.abspath(f"{cwd}/../tmp")
-    os.makedirs(tmp_path, exist_ok=True)
-    return f"sqlite:///{tmp_path}/test.db"
-    # uncomment the below for async setup
-    # return f"sqlite+aiosqlite:///{tmp_path}/test.db"
-
-
-def async2sync_database_uri(database_uri: str) -> str:
-    """
-    translate a async SQLALCHEMY_DATABASE_URI format string
-    to a sync format, which can be used by alembic
-    """
-    if database_uri.startswith("sqlite+aiosqlite:"):
-        return database_uri.replace("+aiosqlite", "")
-    elif database_uri.startswith("postgresql+asyncpg:"):
-        return database_uri.replace("+asyncpg", "+psycopg")
-    else:
-        return database_uri
-
-
-def prep_new_test_db(test_db_url: str) -> tuple[bool, str]:
-    """
-    create a new test database
-    run alembic schema migration
-    then seed the database with some test data
-    return: True if new database created
-    """
-    db_url = async2sync_database_uri(test_db_url)
-    if database_exists(db_url):
-        return False, ""
-
-    logging.info(f"creating test database {db_url}")
-    create_database(db_url)
-
-    # Run the migrations
-    # so we set it so that alembic knows to use the correct database during testing
-    os.environ["ALEMBIC_DATABASE_URI"] = db_url
-    alembic_cfg = Config("alembic.ini")
-    command.upgrade(alembic_cfg, "head")
-
-    # seed test data
-    engine = create_engine(db_url)
-    with sessionmaker(autocommit=False, autoflush=False, bind=engine)() as session:
-        logging.info("adding seed data")
-        seed_data(session)
-
-    return True, db_url
-
-
-test_db_url = os.environ.get("TEST_DATABASE_URI", tmp_sqlite_url())
-
-@pytest.fixture(autouse=True, scope="session")
-def test_db():
-    """
-    prepare the test database:
-    1. if the database does not exist, create it
-    2. run migration on the database
-    3. delete the database after the test, unless KEEP_TEST_DB is set to Y
-    """
-    test_db_created, sync_db_url = prep_new_test_db(test_db_url)
-
-    # the yielded value is not used, but we need this structure to
-    # ensure the cleanup code runs
-    yield
-
-    # only delete the test database if it was created during this test run
-    # to avoid accidental deletion of potentially important data
-    if test_db_created and not is_env_true("KEEP_TEST_DB"):
-        logging.info(f"dropping test database {sync_db_url}")
-        drop_database(sync_db_url)
-
-#
-# begin of sync db setup, remove if async version is used
-#
-conn_args = {"check_same_thread": False} if test_db_url.startswith("sqlite") else {}
-testing_sql_engine = create_engine(test_db_url, connect_args=conn_args, echo=False)
-TestingSessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=testing_sql_engine,
-)
-
-
-def testing_db_session() -> Iterator[Session]:
-    session = TestingSessionLocal()
-    try:
-        yield session
-    finally:
-        session.close()
+{% if "tortoise-orm" in cookiecutter.extra_packages %}
 
 @pytest.fixture(scope="session")
-def session():
-    with TestingSessionLocal() as session:
-        yield session
-
-# end of sync db setup
-
-
-
-#
-# begin of async db setup, uncomment if needed and remove sync setup above
-#
-
-# async_testing_sql_engine = create_async_engine(test_db_url, echo=False)
-# AsyncTestingSessionLocal = async_sessionmaker(
-#     expire_on_commit=False,
-#     class_=AsyncSession,
-#     bind=async_testing_sql_engine,
-# )
+def event_loop():
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
 
 
-# async def testing_db_session() -> AsyncIterator[AsyncSession]:
-#     async with AsyncTestingSessionLocal() as session:
-#         yield session
+@pytest.fixture(scope="session", autouse=True)
+def test_db(request, event_loop):
+    import tortoise.contrib.test as tortoise_test
+    from tortoise import Tortoise
+    from main import TORTOISE_ORM
 
-# @pytest.fixture(scope="session")
-# def event_loop():
-#     """
-#     session scoped event_loop.
-#     in pytest-asyncio the default event loop is function scoped
-#     which causes problem with asyncpg
-#     """
-#     loop = asyncio.get_event_loop_policy().new_event_loop()
-#     yield loop
-#     loop.close()
-#
-# @pytest.fixture()
-# async def session():
-#     async with AsyncTestingSessionLocal() as session:
-#         yield session
-#
-#
-# @pytest.fixture(scope="session")
-# async def client():
-#     async with AsyncClient(app=app, base_url="http://localhost:8000") as client:
-#         yield client
-#
-# end of async db setup
+    test_db_url = os.environ.get("TEST_DATABASE_URL", "sqlite://:memory:")
+    TORTOISE_ORM["connections"]["default"] = test_db_url
+    event_loop.run_until_complete(tortoise_test._init_db(TORTOISE_ORM))
+    event_loop.run_until_complete(seed_db())
 
-# overrides default dependency injection for testing
-app.dependency_overrides[db_session] = testing_db_session
+    if os.environ.get("KEEP_TEST_DB", "N").upper() not in ["Y", "1"]:
+        request.addfinalizer(
+            lambda: event_loop.run_until_complete(Tortoise._drop_databases())
+        )
 
-def seed_data(session):
-    root = User(login_name="root")
-    session.add(root)
-    session.commit()
+
+async def seed_db():
+    await User(login_name="root").save()
+
 {% endif %}
+
+

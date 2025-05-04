@@ -13,7 +13,7 @@ The template supports the following application types with or without database d
 
 * simple
 * [fastpi](https://quart.palletsprojects.com/en/latest/)
-* [fastpi sqlmodel alembic]
+* [fastpi tortoise-orm aerich]
 
 
 To use the template, please install cookiecutter on your computer by following [instructions here](https://cookiecutter.readthedocs.io/en/latest/installation.html)

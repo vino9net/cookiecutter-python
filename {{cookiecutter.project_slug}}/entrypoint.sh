@@ -2,20 +2,16 @@
 
 cd "$(dirname "$0")"
 
-{% if "sqlmodel" in cookiecutter.extra_packages -%}
-if [ "$SQLALCHEMY_DATABASE_URI" = "" ]; then
-    echo SQLALCHEMY_DATABASE_URI not set, aborting.
+{% if "tortoise-orm" in cookiecutter.extra_packages -%}
+if [ "$DATABASE_URL" = "" ]; then
+    echo DATABASE_URL not set, aborting.
     exit 1
 fi
+{% endif -%}
 
-# Check for pending migrations
-current_migration=$(alembic current | awk '{print $1}')
-latest_migration=$(alembic heads | awk '{print $1}')
 
-if [ "$current_migration" != "$latest_migration" ]; then
-    echo "Running migrations before starting app"
-    alembic upgrade head
-fi
+{% if "aerich" in cookiecutter.extra_packages -%}
+aerich upgrade
 {% endif -%}
 
 {% if "fastapi" in cookiecutter.extra_packages -%}

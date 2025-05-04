@@ -1,37 +1,50 @@
-from typing import Iterator, AsyncIterator
+from typing import Iterator
+from dotenv import load_dotenv
 
 {%- if "fastapi" in cookiecutter.extra_packages %}
 import uvicorn
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 {%- endif %}
 
-{%- if "sqlmodel" in cookiecutter.extra_packages %}
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
-from {{ cookiecutter.pkg_name }} import models
-
-from database import SessionLocal
-
-#
-# begin of sync db setup, remove and uncomment async setup below if needed
-#
-def db_session() -> Iterator[Session]:
-    with SessionLocal() as session:
-        yield session
-#
-# begin of async db setup, uncomment and remove sync setup above if needed
-#
-# async def db_session() -> AsyncIterator[AsyncSession]:
-#     async with SessionLocal() as session:
-#         yield session
-
+{%- if "tortoise-orm" in cookiecutter.extra_packages %}
+import os
+from {{ cookiecutter.pkg_name }}.models import User
 {%- endif %}
 
+load_dotenv()
+
+{%- if "tortoise-orm" in cookiecutter.extra_packages %}
+TORTOISE_ORM = {
+    "connections": {"default": os.environ.get("DATABASE_URL")},
+    "apps": {
+        "models": {
+            "models": ["{{ cookiecutter.pkg_name }}.models", "aerich.models"],
+            "default_connection": "default",
+        }
+    },
+}
+{%- endif %}
 
 {%- if "fastapi" in cookiecutter.extra_packages %}
 
-app = FastAPI(docs_url=None, redoc_url=None)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+{%- if "tortoise-orm" in cookiecutter.extra_packages %}
+    from tortoise.contrib.fastapi import RegisterTortoise
+
+    async with RegisterTortoise(
+        app,
+        config=TORTOISE_ORM,
+        generate_schemas=False,
+    ):
+        yield
+{%- else %}
+    yield
+{%- endif %}
+
+
+app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None)
 
 @app.get("/healthz")
 def health():
@@ -43,10 +56,10 @@ def ready():
     return "ready"
 {%- endif %}
 
-{%- if "sqlmodel" in cookiecutter.extra_packages %}
+{%- if "tortoise-orm" in cookiecutter.extra_packages %}
 @app.get("/users/{user_name}")
-def read_user(user_name: str, session: Session = Depends(db_session)):
-    user = session.execute(select(models.User).filter_by(login_name=user_name)).scalars().first() # noqa: E501
+async def get_user(user_name: str):
+    user = await User.filter(login_name=user_name).first()
     if user:
         return {"user_id": user.id}
 {%- endif %}

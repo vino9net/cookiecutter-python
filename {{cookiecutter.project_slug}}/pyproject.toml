@@ -12,9 +12,9 @@ dependencies = [
     "fastapi[standard]>=0.115.12",
     "ulid-py>=1.1.0",
 {%- endif %}
-{%- if "sqlmodel" in cookiecutter.extra_packages %}
-    "sqlmodel>=0.0.24",
-    "alembic >= 1.15.2",
+{%- if "tortoise-orm" in cookiecutter.extra_packages %}
+    "aerich[toml]>=0.8.2",
+    "aiosqlite>=0.21.0",
 {%- endif %}
 ]
 
@@ -38,9 +38,6 @@ dev = [
     "pre-commit >= 4.0.1",
     "ruff >= 0.11.8",
     "pyright >= 1.1.400",
-{%- if "sqlmodel" in cookiecutter.extra_packages %}
-    "sqlalchemy-utils>=0.41.2",
-{%- endif %}
 ]
 
 [tool.uv]
@@ -74,7 +71,7 @@ exclude = [
     "__pycache__",
     "venv",
     ".venv",
-{%- if "alembic" in cookiecutter.extra_packages %}
+{%- if "aerich" in cookiecutter.extra_packages %}
     "migrations",
 {%- endif %}
 ]
@@ -89,3 +86,11 @@ select = [
     "A",
 ] # Enable checks for PEP8, imports, and other standard rules
 ignore = ["E203", "E266"]
+
+
+{%- if "aerich" in cookiecutter.extra_packages %}
+[tool.aerich]
+tortoise_orm = "main.TORTOISE_ORM"
+location = "./migrations"
+src_folder = "./."
+{%- endif %}

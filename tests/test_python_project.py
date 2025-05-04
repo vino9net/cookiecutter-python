@@ -104,8 +104,7 @@ def check_project_structure(project_path, context):
         assert (project_path / "Dockerfile").is_file()
         assert (project_path / ".github").is_dir()
 
-    if "sqlmodel" in extra_packages:
-        assert (project_path / "alembic.ini").is_file()
+    if "aerich" in extra_packages:
         assert (project_path / "migrations").is_dir()
 
 
@@ -140,7 +139,7 @@ def scenario_id(context) -> str:
     elif context["extra_packages"] == "fastapi":
         extra_packages = "fastapi"
     else:
-        extra_packages = "fastpi-sqlmodel"
+        extra_packages = "fastpi-tortoise"
 
     use_devcontainer = "devcon" if context["use_devcontainer"] == "Yes" else "nodevcon"
 
@@ -210,7 +209,7 @@ def test_local_generate(cookies):
             "project_type": "lib",
             "use_devcontainer": "No",
             "dockerfile_option": "Build container with Github action",
-            "extra_packages": "fastapi sqlmodel alembic",
+            "extra_packages": "fastapi tortoise-orm aerich",
             # "extra_packages": "fastapi",
         }
     )
