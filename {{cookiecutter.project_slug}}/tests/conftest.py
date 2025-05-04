@@ -24,9 +24,19 @@ cwd = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.abspath(f"{cwd}/.."))
 
 
+{% if "fastapi" in cookiecutter.extra_packages %}
+from main import app # noqa: E402
+
+@pytest.fixture(scope="session")
+def client():
+    client = TestClient(app)
+    yield client
+{% endif %}
+
+
 {% if "sqlmodel" in cookiecutter.extra_packages %}
 # the following import only works after sys.path is updated
-from main import app, db_session  # noqa: E402
+from main import db_session  # noqa: E402
 from {{cookiecutter.pkg_name}}.models import User # noqa: E402
 
 # helper functions
@@ -129,11 +139,6 @@ def testing_db_session() -> Iterator[Session]:
 def session():
     with TestingSessionLocal() as session:
         yield session
-
-@pytest.fixture(scope="session")
-def client():
-    client = TestClient(app)
-    yield client
 
 # end of sync db setup
 
