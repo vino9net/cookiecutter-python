@@ -36,7 +36,7 @@ dev = [
     "pytest-cov >= 6.0",
     "pytest-asyncio>=0.24.0",
     "pre-commit >= 4.0.1",
-    "ruff >= 0.9.6",
+    "ruff >= 0.11.8",
     "pyright >= 1.1.400",
 {%- if "sqlmodel" in cookiecutter.extra_packages %}
     "sqlalchemy-utils>=0.41.2",
@@ -69,7 +69,15 @@ omit = [
 [tool.ruff]
 line-length = 90
 indent-width = 4
-exclude = [".git", "__pycache__", "venv", ".venv"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "venv",
+    ".venv",
+{%- if "alembic" in cookiecutter.extra_packages %}
+    "migrations",
+{%- endif %}
+]
 
 [tool.ruff.lint]
 select = [
