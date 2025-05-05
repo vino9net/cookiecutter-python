@@ -1,12 +1,17 @@
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from security import get_jwt_verifier
 
-{% if "tortoise-orm" in cookiecutter.extra_packages %}
-from .models import User
+{%- if "sqlmodel" in cookiecutter.extra_packages %}
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+from fastapi import Depends, HTTPException
+from {{ cookiecutter.pkg_name }}.models  import User
+
+from database import db_session
 {% endif %}
 
 logger = logging.getLogger(__name__)
@@ -25,10 +30,11 @@ async def get_secret(
 ):
     return {"info": "This is secret protected by JWT token"}
 
-{% if "tortoise-orm" in cookiecutter.extra_packages %}
+{%- if "sqlmodel" in cookiecutter.extra_packages %}
 @router.get("/users/{user_name}")
-async def get_user(user_name: str):
-    user = await User.filter(login_name=user_name).first()
-    if user:
-        return {"user_id": user.id}
-{% endif %}
+def read_user(user_name: str, session: Session = Depends(db_session)):
+    user = session.execute(select(User).filter_by(login_name=user_name)).scalars().first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+{%- endif %}

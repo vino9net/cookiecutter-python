@@ -1,4 +1,4 @@
-{%- if "aerich" in cookiecutter.extra_packages %}
+{%- if "alembic" in cookiecutter.extra_packages %}
 exclude: "^$|deploy|scripts|tmp|migrations"
 {%- else %}
 exclude: "^$|deploy|scripts|tmp"

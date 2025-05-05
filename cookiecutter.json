@@ -19,7 +19,7 @@
   "extra_packages": [
     "none",
     "fastapi",
-    "fastapi tortoise-orm aerich"
+    "fastapi sqlmodel alembic"
   ],
   "version": "0.1.0",
   "_copy_without_render": [

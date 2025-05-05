@@ -22,8 +22,8 @@ async def test_secret_authenticated(mock_get_jwks_data, client, mock_file_conten
 {% endif %}
 
 
-{% if "tortoise-orm" in cookiecutter.extra_packages %}
-async def test_get_user(client):
+{% if "sqlmodel" in cookiecutter.extra_packages %}
+async def test_get_user(client, test_db):
     response = client.get("/api/users/root")
     assert response.status_code == 200
 {% endif %}

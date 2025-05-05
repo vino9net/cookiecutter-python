@@ -13,8 +13,9 @@ class AppSettings(BaseSettings):
     app_name: str = "{{ cookiecutter.pkg_name }}"
     api_audience: str = "{{ cookiecutter.pkg_name }}"
     jwks_url: str
-{% if "tortoise-orm" in cookiecutter.extra_packages %}
-    database_url: str
+{% if "sqlmodel" in cookiecutter.extra_packages %}
+    sqlalchemy_database_uri: str = "sqlite:///memory:"
+    async_orm: bool = False
 {% endif %}
 
 

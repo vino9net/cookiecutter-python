@@ -1,5 +1,6 @@
+from sqlalchemy import select
 from {{ cookiecutter.pkg_name }}.models import User
 
-async def test_query_models():
-    user = await User.filter(login_name="root").first()
+def test_query_models(session):
+    user = session.execute(select(User).filter_by(login_name="root")).scalars().first()
     assert user and user.id == 1
