@@ -20,10 +20,11 @@ from {{ cookiecutter.pkg_name }}.models import User
 
 load_dotenv()
 
-logger_config_path = Path(__file__).parent / "logger_config.yaml"
-if logger_config_path.exists():
-    with open(logger_config_path, "r") as f:
-        logging.config.dictConfig(yaml.safe_load(f))
+# Load the logging configuration
+LOGGING_CONFIG = {}
+with open(Path(__file__).parent / "logger_config.yaml", "r") as f:
+    LOGGING_CONFIG = yaml.safe_load(f)
+    logging.config.dictConfig(LOGGING_CONFIG)
 
 {% if "tortoise-orm" in cookiecutter.extra_packages %}
 TORTOISE_ORM = {
@@ -41,6 +42,10 @@ TORTOISE_ORM = {
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # change uvicorn access log format
+    logger = logging.getLogger("uvicorn.access")
+    console_formatter = uvicorn.logging.ColourizedFormatter(LOGGING_CONFIG["formatters"]["standard"]["format"]) # pyright: ignore
+    logger.handlers[0].setFormatter(console_formatter)
 {% if "tortoise-orm" in cookiecutter.extra_packages %}
     from tortoise.contrib.fastapi import RegisterTortoise
 

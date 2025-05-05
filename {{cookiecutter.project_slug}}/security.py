@@ -38,9 +38,7 @@ def get_jwt_verifier(required_scope: str) -> Callable:
         signer_jwks = await get_jwks_data()
         token = credentials.credentials
         try:
-            payload = jwt.decode(
-                token, signer_jwks, algorithms="RS256", audience=settings.api_audience
-            )
+            payload = jwt.decode(token, signer_jwks, audience=settings.api_audience)
             scopes: List[str] = payload.get("scope", "").split()
             if required_scope not in scopes:
                 logger.info(
