@@ -1,28 +1,41 @@
-import os
+from typing import AsyncIterator, Iterator
 
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import StaticPool
 
-__all__ = ["SessionLocal", "engine"]
+from settings import settings
 
-load_dotenv()
+# sync engine is always enabled
+db_url = settings.sqlalchemy_database_uri
+if ":memory:" in db_url:
+    # must use StaticPool for in-memory SQLite database
+    # in order for different connections to share the same data
+    engine = create_engine(
+        db_url,
+        connect_args={"check_same_thread": False},
+        echo=False,
+        poolclass=StaticPool,
+    )
+else:
+    engine = create_engine(db_url, echo=False)
 
-db_url = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///memory:")
-
-#
-# begin of sync db setup, remove and uncomment async setup below if needed
-#
-conn_args = {"check_same_thread": False} if db_url.startswith("sqlite") else {}
-
-db_url = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///memory:")
-engine = create_engine(db_url, connect_args=conn_args, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-#
-# begin of async db setup, uncomment and remove sync setup above if needed
-#
-# db_url = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite+aiosqlite:///memory:")
-# engine = create_async_engine(db_url, echo=False)
-# SessionLocal = async_sessionmaker(bind=engine, autoflush=False, future=True)
+
+def db_session() -> Iterator[Session]:
+    with SessionLocal() as session:
+        yield session
+
+
+# async engine can be enabled by setting
+if settings.async_orm:
+    async_engine = create_async_engine(db_url, echo=False)
+    AsyncSessionLocal = async_sessionmaker(
+        bind=async_engine, autoflush=False, future=True
+    )
+
+    async def async_db_session() -> AsyncIterator[AsyncSession]:
+        async with AsyncSessionLocal() as session:
+            yield session

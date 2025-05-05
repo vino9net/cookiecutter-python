@@ -104,8 +104,7 @@ def check_project_structure(project_path, context):
         assert (project_path / "Dockerfile").is_file()
         assert (project_path / ".github").is_dir()
 
-    if "sqlmodel" in extra_packages:
-        assert (project_path / "alembic.ini").is_file()
+    if "alembic" in extra_packages:
         assert (project_path / "migrations").is_dir()
 
 
@@ -140,7 +139,7 @@ def scenario_id(context) -> str:
     elif context["extra_packages"] == "fastapi":
         extra_packages = "fastapi"
     else:
-        extra_packages = "fastpi-sqlmodel"
+        extra_packages = "fastpi-sql"
 
     use_devcontainer = "devcon" if context["use_devcontainer"] == "Yes" else "nodevcon"
 

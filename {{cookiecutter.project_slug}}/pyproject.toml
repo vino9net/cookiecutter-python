@@ -7,14 +7,18 @@ readme = "README.md"
 
 requires-python = ">= 3.12"
 dependencies = [
-    "python-dotenv >= 1.0.0",
+{%- if "none" in cookiecutter.extra_packages %}
+    "python-dotenv >= 1.0.1",
+{%- endif %}
 {%- if "fastapi" in cookiecutter.extra_packages %}
-    "fastapi[standard]>=0.115.8",
+    "fastapi[standard]>=0.115.12",
     "ulid-py>=1.1.0",
+    "python-jose[cryptography]>=3.4.0",
+    "pydantic-settings>=2.9.1",
 {%- endif %}
 {%- if "sqlmodel" in cookiecutter.extra_packages %}
-    "sqlmodel>=0.0.22",
-    "alembic >= 1.14.1",
+    "sqlmodel>=0.0.24",
+    "alembic >= 1.15.2",
 {%- endif %}
 ]
 
@@ -33,11 +37,11 @@ dev = [
     "pytest >= 8.3.0",
     "pytest-dotenv >= 0.5.2",
     "pytest-mock >= 3.14",
-    "pytest-cov >= 6.0",
-    "pytest-asyncio>=0.24.0",
+    "pytest-cov >= 6.1",
+    "pytest-asyncio>=0.25.3",
     "pre-commit >= 4.0.1",
-    "ruff >= 0.9.6",
-    "pyright >= 1.1.394",
+    "ruff >= 0.11.8",
+    "pyright >= 1.1.400",
 {%- if "sqlmodel" in cookiecutter.extra_packages %}
     "sqlalchemy-utils>=0.41.2",
 {%- endif %}
@@ -69,7 +73,15 @@ omit = [
 [tool.ruff]
 line-length = 90
 indent-width = 4
-exclude = [".git", "__pycache__", "venv", ".venv"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "venv",
+    ".venv",
+{%- if "alembic" in cookiecutter.extra_packages %}
+    "migrations",
+{%- endif %}
+]
 
 [tool.ruff.lint]
 select = [

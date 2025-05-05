@@ -1,5 +1,6 @@
 import os
-import sys
+from pathlib import Path
+from typing import Callable
 import pytest
 import logging
 
@@ -8,85 +9,41 @@ from fastapi.testclient import TestClient
 {% endif %}
 
 {% if "sqlmodel" in cookiecutter.extra_packages %}
-import asyncio
-from typing import AsyncIterator, Iterator
-
-from alembic import command
-from alembic.config import Config
-from httpx import AsyncClient
-from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
+from settings import settings
+SQLITE_MEMROY_DB = "sqlite:///:memory:"
+test_database_url = os.environ.get("TEST_DATABASE_URI", SQLITE_MEMROY_DB)
+settings.sqlalchemy_database_uri = test_database_url
+{% endif %}
+mock_data_path = Path(__file__).parent / "mockdata"
+
+{% if "fastapi" in cookiecutter.extra_packages %}
+logging.getLogger("httpx").setLevel(logging.WARNING)
 {% endif %}
 
-cwd = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(f"{cwd}/.."))
+@pytest.fixture(scope="session")
+def mock_file_content() -> Callable:
+    def _mock_file_content(file_name):
+        with open(mock_data_path / file_name, "r") as f:
+            return f.read()
+
+    return _mock_file_content
+
+
+{% if "fastapi" in cookiecutter.extra_packages %}
+@pytest.fixture(scope="session")
+def client():
+    # keep this import here
+    # moving it outside will automitcally import settings
+    # and break our mechanism use TEST_DATABASE_URI
+    from main import app
+    client = TestClient(app)
+    yield client
+{% endif %}
 
 
 {% if "sqlmodel" in cookiecutter.extra_packages %}
-# the following import only works after sys.path is updated
-from main import app, db_session  # noqa: E402
-from {{cookiecutter.pkg_name}}.models import User # noqa: E402
-
-# helper functions
-def is_env_true(var_name: str) -> bool:
-    return os.environ.get(var_name, "N").upper() in ["1", "Y", "YES", "TRUE"]
-
-
-def tmp_sqlite_url():
-    tmp_path = os.path.abspath(f"{cwd}/../tmp")
-    os.makedirs(tmp_path, exist_ok=True)
-    return f"sqlite:///{tmp_path}/test.db"
-    # uncomment the below for async setup
-    # return f"sqlite+aiosqlite:///{tmp_path}/test.db"
-
-
-def async2sync_database_uri(database_uri: str) -> str:
-    """
-    translate a async SQLALCHEMY_DATABASE_URI format string
-    to a sync format, which can be used by alembic
-    """
-    if database_uri.startswith("sqlite+aiosqlite:"):
-        return database_uri.replace("+aiosqlite", "")
-    elif database_uri.startswith("postgresql+asyncpg:"):
-        return database_uri.replace("+asyncpg", "+psycopg")
-    else:
-        return database_uri
-
-
-def prep_new_test_db(test_db_url: str) -> tuple[bool, str]:
-    """
-    create a new test database
-    run alembic schema migration
-    then seed the database with some test data
-    return: True if new database created
-    """
-    db_url = async2sync_database_uri(test_db_url)
-    if database_exists(db_url):
-        return False, ""
-
-    logging.info(f"creating test database {db_url}")
-    create_database(db_url)
-
-    # Run the migrations
-    # so we set it so that alembic knows to use the correct database during testing
-    os.environ["ALEMBIC_DATABASE_URI"] = db_url
-    alembic_cfg = Config("alembic.ini")
-    command.upgrade(alembic_cfg, "head")
-
-    # seed test data
-    engine = create_engine(db_url)
-    with sessionmaker(autocommit=False, autoflush=False, bind=engine)() as session:
-        logging.info("adding seed data")
-        seed_data(session)
-
-    return True, db_url
-
-
-test_db_url = os.environ.get("TEST_DATABASE_URI", tmp_sqlite_url())
-
-@pytest.fixture(autouse=True, scope="session")
+@pytest.fixture(scope="session")
 def test_db():
     """
     prepare the test database:
@@ -94,7 +51,21 @@ def test_db():
     2. run migration on the database
     3. delete the database after the test, unless KEEP_TEST_DB is set to Y
     """
-    test_db_created, sync_db_url = prep_new_test_db(test_db_url)
+    # this import statement should stay here
+    # we must override settings.sqlalchemy_database_uri first
+    # before imporing the database module
+    from database import SessionLocal
+
+    database_url = _async2sync_database_uri(test_database_url)
+    if database_url != SQLITE_MEMROY_DB:
+        print(f"creating test database {database_url}")
+        test_db_created = _create_test_db(database_url)
+    else:
+        test_db_created = False
+
+    # seed test data
+    with SessionLocal() as session:
+        _seed_data(session)
 
     # the yielded value is not used, but we need this structure to
     # ensure the cleanup code runs
@@ -102,88 +73,63 @@ def test_db():
 
     # only delete the test database if it was created during this test run
     # to avoid accidental deletion of potentially important data
-    if test_db_created and not is_env_true("KEEP_TEST_DB"):
-        logging.info(f"dropping test database {sync_db_url}")
-        drop_database(sync_db_url)
-
-#
-# begin of sync db setup, remove if async version is used
-#
-conn_args = {"check_same_thread": False} if test_db_url.startswith("sqlite") else {}
-testing_sql_engine = create_engine(test_db_url, connect_args=conn_args, echo=False)
-TestingSessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=testing_sql_engine,
-)
+    if test_db_created and not _is_env_true("KEEP_TEST_DB"):
+        print(f"dropping test database {database_url}")
+        drop_database(database_url)
 
 
-def testing_db_session() -> Iterator[Session]:
-    session = TestingSessionLocal()
-    try:
-        yield session
-    finally:
-        session.close()
+@pytest.fixture(scope="function")
+def session(test_db):
+    # this import statement should stay here
+    # we must override settings.sqlalchemy_database_uri first
+    # before imporing the database module
+    from database import SessionLocal
 
-@pytest.fixture(scope="session")
-def session():
-    with TestingSessionLocal() as session:
+    with SessionLocal() as session:
         yield session
 
-@pytest.fixture(scope="session")
-def client():
-    client = TestClient(app)
-    yield client
 
-# end of sync db setup
+def _create_test_db(database_url: str) -> bool:
+    """
+    create a new test database
+    run alembic schema migration
+    then seed the database with some test data
+    return: True if new database created
+    """
+    if database_exists(database_url):
+        return False
 
+    create_database(database_url)
 
-
-#
-# begin of async db setup, uncomment if needed and remove sync setup above
-#
-
-# async_testing_sql_engine = create_async_engine(test_db_url, echo=False)
-# AsyncTestingSessionLocal = async_sessionmaker(
-#     expire_on_commit=False,
-#     class_=AsyncSession,
-#     bind=async_testing_sql_engine,
-# )
+    return True
 
 
-# async def testing_db_session() -> AsyncIterator[AsyncSession]:
-#     async with AsyncTestingSessionLocal() as session:
-#         yield session
+def _seed_data(session):
+    from {{ cookiecutter.pkg_name }}.models import Base, User
 
-# @pytest.fixture(scope="session")
-# def event_loop():
-#     """
-#     session scoped event_loop.
-#     in pytest-asyncio the default event loop is function scoped
-#     which causes problem with asyncpg
-#     """
-#     loop = asyncio.get_event_loop_policy().new_event_loop()
-#     yield loop
-#     loop.close()
-#
-# @pytest.fixture()
-# async def session():
-#     async with AsyncTestingSessionLocal() as session:
-#         yield session
-#
-#
-# @pytest.fixture(scope="session")
-# async def client():
-#     async with AsyncClient(app=app, base_url="http://localhost:8000") as client:
-#         yield client
-#
-# end of async db setup
-
-# overrides default dependency injection for testing
-app.dependency_overrides[db_session] = testing_db_session
-
-def seed_data(session):
+    Base.metadata.create_all(session.get_bind())
     root = User(login_name="root")
     session.add(root)
     session.commit()
+
+
+# helper functions
+def _is_env_true(var_name: str) -> bool:
+    return os.environ.get(var_name, "N").upper() in ["1", "Y", "YES", "TRUE"]
+
+
+def _async2sync_database_uri(database_uri: str) -> str:
+    """
+    translate a async SQLALCHEMY_DATABASE_URI format string
+    to a sync format, which can be used by database utilities
+    """
+    from urllib.parse import urlparse, urlunparse
+
+    parsed = urlparse(database_uri)
+    parts = parsed.scheme.split("+")
+    if len(parts) > 1:
+        return urlunparse(parsed._replace(scheme=parts[0]))
+    else:
+        return database_uri
 {% endif %}
+
