@@ -52,6 +52,16 @@ def test_db(request, event_loop):
         request.addfinalizer(
             lambda: event_loop.run_until_complete(Tortoise._drop_databases())
         )
+    # the block below shouldn't be neccessary, but as of 2025-05-05
+    # tortoise 0.25.0 has a bug that leaves the connection open
+    # thus pytest will hang. the workround is simply explictly closing
+    # the connection, which is what Tortoise._drop_databases() does
+    elif test_db_url.startswith("sqlite://") and ":memory:" not in test_db_url:
+        request.addfinalizer(
+            lambda: event_loop.run_until_complete(
+                Tortoise.get_connection("default").close()
+            )
+        )
 
 
 async def seed_db():

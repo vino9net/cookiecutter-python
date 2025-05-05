@@ -17,8 +17,8 @@ dependencies = [
     "pydantic-settings>=2.9.1",
 {%- endif %}
 {%- if "tortoise-orm" in cookiecutter.extra_packages %}
+    "tortoise-orm>=0.25.0",
     "aerich[toml]>=0.8.2",
-    "aiosqlite>=0.21.0",
 {%- endif %}
 ]
 
