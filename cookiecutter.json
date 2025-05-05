@@ -17,7 +17,7 @@
     "None"
   ],
   "extra_packages": [
-    "None",
+    "none",
     "fastapi",
     "fastapi tortoise-orm aerich"
   ],

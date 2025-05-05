@@ -48,6 +48,14 @@ if "tortoise-orm" not in extra_packages:
     os.unlink("tests/test_models.py")
     shutil.rmtree("migrations")
 
+if "fastapi" not in extra_packages:
+    os.unlink(f"{pkg_name}/api.py")
+    os.unlink("tests/test_server.py")
+    os.unlink("tests/jwt_utils.py")
+    os.unlink("settings.py")
+    os.unlink("security.py")
+    shutil.rmtree("tests/mockdata/jwt")
+
 
 # create a git repo, everybody needs this, right?
 print("Initializing git repo...")

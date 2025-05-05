@@ -21,6 +21,10 @@ The easiest way to get started is use [Visual Studio Code with devcontainer](htt
 # create virtualenv and install dependencies
 uv sync
 source .venv/bin/activate
+pre-commit install
 ruff check --fix .
+pytest -v
 
 ```
+
+##

@@ -1,8 +1,8 @@
 import asyncio
 import os
-import sys
+from pathlib import Path
+from typing import Callable
 import pytest
-import logging
 
 {% if "fastapi" in cookiecutter.extra_packages %}
 from fastapi.testclient import TestClient
@@ -14,7 +14,11 @@ from {{ cookiecutter.pkg_name }}.models import User
 
 {% if "fastapi" in cookiecutter.extra_packages %}
 from main import app
+{% endif %}
 
+mock_data_path = Path(__file__).parent / "mockdata"
+
+{% if "fastapi" in cookiecutter.extra_packages %}
 @pytest.fixture(scope="session")
 def client():
     client = TestClient(app)
@@ -55,4 +59,11 @@ async def seed_db():
 
 {% endif %}
 
+@pytest.fixture(scope="session")
+def mock_file_content() -> Callable:
+    def _mock_file_content(file_name):
+        with open(mock_data_path / file_name, "r") as f:
+            return f.read()
+
+    return _mock_file_content
 
