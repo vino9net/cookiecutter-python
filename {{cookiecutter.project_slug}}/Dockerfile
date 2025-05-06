@@ -1,7 +1,7 @@
 # stage 1: build
-FROM python:3.12-bookworm as builder
-LABEL org.opencontainers.image.source https://github.com/owner/{{ cookiecutter.project_slug }}
-LABEL org.opencontainers.image.description "{{ cookiecutter.project_short_description }}"
+FROM python:3.12-bookworm AS builder
+LABEL org.opencontainers.image.source=https://github.com/owner/{{ cookiecutter.project_slug }}
+LABEL org.opencontainers.image.description="{{ cookiecutter.project_short_description }}"
 
 # install packages needed by python packages
 RUN apt-get update \
