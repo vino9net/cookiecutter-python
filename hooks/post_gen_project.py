@@ -74,7 +74,12 @@ subprocess.call(
 # check if ruff is on PATH, if so run uv to format the output
 try:
     print("Running ruff...")
-    subprocess.call(shlex.split("uvx ruff check --fix ."))
+    subprocess.call(shlex.split("uvx ruff check --fix ."), stdout=subprocess.DEVNULL)
+    subprocess.call(shlex.split("git add * "), stdout=subprocess.DEVNULL)
+    subprocess.call(
+        shlex.split("git commit -m 'ruff check fix after generation' "),
+        stdout=subprocess.DEVNULL,
+    )
 except Exception as e:
     print(f"Got error while running ruff: {e}")
 
