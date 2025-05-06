@@ -32,7 +32,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan, redoc_url=None)
+app = FastAPI(title=settings.app_name, lifespan=lifespan, redoc_url=None)
 app.include_router({{ cookiecutter.pkg_name }}_router)
 
 @app.get("/healthz")

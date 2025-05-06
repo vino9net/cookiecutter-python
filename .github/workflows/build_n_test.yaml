@@ -5,7 +5,6 @@ on:
     branches:
       - develop
       - main
-      - poetry
 
   pull_request:
     branches:

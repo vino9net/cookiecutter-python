@@ -12,9 +12,9 @@
     "Yes"
   ],
   "dockerfile_option": [
+    "None",
     "Dockerfile only",
-    "Build container with Github action",
-    "None"
+    "Build container with Github action"
   ],
   "extra_packages": [
     "none",

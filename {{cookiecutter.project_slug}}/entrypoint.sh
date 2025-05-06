@@ -3,8 +3,8 @@
 cd "$(dirname "$0")"
 
 {% if "sqlmodel" in cookiecutter.extra_packages -%}
-if [ "$SQLALCHEMY_DATABASE_URI" = "" ]; then
-    echo SQLALCHEMY_DATABASE_URI not set, aborting.
+if [ "$DATABASE_URL" = "" ]; then
+    echo DATABASE_URL not set, aborting.
     exit 1
 fi
 {% endif -%}
