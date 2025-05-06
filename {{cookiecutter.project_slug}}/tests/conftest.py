@@ -11,9 +11,8 @@ from fastapi.testclient import TestClient
 {% if "sqlmodel" in cookiecutter.extra_packages %}
 from sqlalchemy_utils import create_database, database_exists, drop_database
 from settings import settings
-SQLITE_MEMROY_DB = "sqlite:///:memory:"
-test_database_url = os.environ.get("TEST_DATABASE_URI", SQLITE_MEMROY_DB)
-settings.sqlalchemy_database_uri = test_database_url
+test_database_url = os.environ.get("TEST_DATABASE_URL", "sqlite:///:memory:")
+settings.database_url = test_database_url
 {% endif %}
 mock_data_path = Path(__file__).parent / "mockdata"
 
@@ -35,7 +34,7 @@ def mock_file_content() -> Callable:
 def client():
     # keep this import here
     # moving it outside will automitcally import settings
-    # and break our mechanism use TEST_DATABASE_URI
+    # and break our mechanism use TEST_DATABASE_URL
     from main import app
     client = TestClient(app)
     yield client
@@ -52,14 +51,13 @@ def test_db():
     3. delete the database after the test, unless KEEP_TEST_DB is set to Y
     """
     # this import statement should stay here
-    # we must override settings.sqlalchemy_database_uri first
+    # we must override settings.database_url first
     # before imporing the database module
-    from database import SessionLocal
+    from database import SessionLocal, _is_in_memory_db
 
-    database_url = _async2sync_database_uri(test_database_url)
-    if database_url != SQLITE_MEMROY_DB:
-        print(f"creating test database {database_url}")
-        test_db_created = _create_test_db(database_url)
+    if not _is_in_memory_db(test_database_url):
+        print(f"\ncreating test database {test_database_url}")
+        test_db_created = _create_test_db(test_database_url)
     else:
         test_db_created = False
 
@@ -73,14 +71,14 @@ def test_db():
     # only delete the test database if it was created during this test run
     # to avoid accidental deletion of potentially important data
     if test_db_created and not _is_env_true("KEEP_TEST_DB"):
-        print(f"dropping test database {database_url}")
-        drop_database(database_url)
+        print(f"\ndropping test database {test_database_url}")
+        drop_database(test_database_url)
 
 
 @pytest.fixture(scope="function")
 def session(test_db):
     # this import statement should stay here
-    # we must override settings.sqlalchemy_database_uri first
+    # we must override settings.database_url first
     # before imporing the database module
     from database import SessionLocal
 
@@ -114,20 +112,5 @@ def _seed_data(session):
 # helper functions
 def _is_env_true(var_name: str) -> bool:
     return os.environ.get(var_name, "N").upper() in ["1", "Y", "YES", "TRUE"]
-
-
-def _async2sync_database_uri(database_uri: str) -> str:
-    """
-    translate a async SQLALCHEMY_DATABASE_URI format string
-    to a sync format, which can be used by database utilities
-    """
-    from urllib.parse import urlparse, urlunparse
-
-    parsed = urlparse(database_uri)
-    parts = parsed.scheme.split("+")
-    if len(parts) > 1:
-        return urlunparse(parsed._replace(scheme=parts[0]))
-    else:
-        return database_uri
 {% endif %}
 
