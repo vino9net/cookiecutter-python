@@ -63,7 +63,6 @@ def test_db():
     else:
         test_db_created = False
 
-    # seed test data
     with SessionLocal() as session:
         _seed_data(session)
 
@@ -98,10 +97,9 @@ def _create_test_db(database_url: str) -> bool:
     """
     if database_exists(database_url):
         return False
-
-    create_database(database_url)
-
-    return True
+    else:
+        create_database(database_url)
+        return True
 
 
 def _seed_data(session):

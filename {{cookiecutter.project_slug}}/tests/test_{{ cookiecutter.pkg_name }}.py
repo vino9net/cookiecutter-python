@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock, patch
 
 from tests.jwt_utils import create_jwt_token
 
+
 async def test_info(client):
     response = client.get("/api/info")
     assert response.status_code == 200
