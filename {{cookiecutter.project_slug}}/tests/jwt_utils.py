@@ -4,9 +4,11 @@ import os
 import sys
 import time
 from pathlib import Path
+from typing import Any, Dict, Tuple
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey, RSAPublicKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 from jose import jwt
 
@@ -15,7 +17,7 @@ os.makedirs(output_path, exist_ok=True)
 
 
 # Generate RSA key pair
-def generate_rsa_key_pair():
+def generate_rsa_key_pair() -> Tuple[RSAPrivateKey, bytes, bytes]:
     key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     private_key_pem = key.private_bytes(
         encoding=serialization.Encoding.PEM,
@@ -31,7 +33,7 @@ def generate_rsa_key_pair():
 
 
 # Encode public key to JWKS
-def create_jwks(public_key, kid="pytest"):
+def create_jwks(public_key: RSAPublicKey, kid: str = "pytest") -> Dict[str, Any]:
     numbers = public_key.public_numbers()
     e = base64.urlsafe_b64encode(numbers.e.to_bytes(3, "big")).decode("utf-8").rstrip("=")
     n = (
@@ -62,10 +64,10 @@ def create_jwks(public_key, kid="pytest"):
 
 # Generate JWT
 def create_jwt_token(
-    scope,
-    audience,
-    kid="pytest",
-):
+    scope: str,
+    audience: str,
+    kid: str = "pytest",
+) -> str:
     with open(output_path / "private_key.pem", "rb") as f:
         private_key = f.read()
 
@@ -82,13 +84,13 @@ def create_jwt_token(
     return token
 
 
-def derive_public_key(private_key_pem):
+def derive_public_key(private_key_pem: bytes) -> RSAPublicKey:
     private_key = serialization.load_pem_private_key(
         private_key_pem,
         password=None,
     )
     public_key = private_key.public_key()
-    return public_key
+    return public_key  # pyright: ignore
 
 
 if __name__ == "__main__":
