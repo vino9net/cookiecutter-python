@@ -45,7 +45,9 @@ else:
 
 if "sqlmodel" not in extra_packages:
     os.unlink(f"{pkg_name}/models.py")
+    os.unlink("tests/test_helper.py")
     os.unlink("tests/test_models.py")
+    os.unlink("helper.py")
     os.unlink("alembic.ini")
     os.unlink("database.py")
     shutil.rmtree("migrations")

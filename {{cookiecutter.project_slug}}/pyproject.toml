@@ -7,7 +7,7 @@ readme = "README.md"
 
 requires-python = ">= 3.12"
 dependencies = [
-{%- if "none" in cookiecutter.extra_packages %}
+{%- if "None" in cookiecutter.extra_packages %}
     "python-dotenv >= 1.0.1",
 {%- endif %}
 {%- if "fastapi" in cookiecutter.extra_packages %}
@@ -19,6 +19,10 @@ dependencies = [
 {%- if "sqlmodel" in cookiecutter.extra_packages %}
     "sqlmodel>=0.0.24",
     "alembic >= 1.15.2",
+    # sqlalchemy[asyncio] somehow does not install
+    # greenlet on M1 Macs (arm64)
+    "greenlet; platform_machine == 'arm64'",
+    "aiosqlite==0.21.0",
 {%- endif %}
 ]
 

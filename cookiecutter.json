@@ -17,7 +17,7 @@
     "Build container with Github action"
   ],
   "extra_packages": [
-    "none",
+    "None",
     "fastapi",
     "fastapi sqlmodel alembic"
   ],
