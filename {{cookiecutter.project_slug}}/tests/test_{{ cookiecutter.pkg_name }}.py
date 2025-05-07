@@ -1,6 +1,7 @@
 {% if "fastapi" in cookiecutter.extra_packages %}
 from unittest.mock import AsyncMock, patch
 
+from settings import settings
 from tests.jwt_utils import create_jwt_token
 
 
@@ -17,7 +18,7 @@ async def test_secret_unauthenticated(client):
 @patch("security.get_jwks_data", new_callable=AsyncMock)
 async def test_secret_authenticated(mock_get_jwks_data, client, mock_file_content):
     mock_get_jwks_data.return_value = mock_file_content("jwt/jwks.json")
-    jwt_token = create_jwt_token(scope="read:data")
+    jwt_token = create_jwt_token(scope="read:data", audience=settings.api_audience)
     response = client.get("/api/secret", headers={"Authorization": "Bearer " + jwt_token})
     assert response.status_code == 200
 {% endif %}
