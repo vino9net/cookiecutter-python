@@ -1,6 +1,6 @@
 [project]
 name = "vino-cookiecutter-python"
-version = "0.3.0"
+version = "0.3.2"
 description = "Copier template for generic Python 3 project with tooling configuration for testing, linting and IDE support"
 authors = [{ name = "Li Lin", email = "guru.lin@gmail.com" }]
 readme = "README.md"
@@ -17,8 +17,8 @@ dev = [
     "pytest-dotenv >= 0.5.2",
     "pytest-mock >= 3.14",
     "pre-commit >= 4.0.1",
-    "ruff >= 0.9.6",
-    "pyright >= 1.1.394",
+    "ruff >= 0.11.8",
+    "pyright >= 1.1.400",
     "pytest-cookies>=0.7.0",
 ]
 

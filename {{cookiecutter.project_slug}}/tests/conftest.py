@@ -10,17 +10,14 @@ from fastapi.testclient import TestClient
 
 {% if "sqlmodel" in cookiecutter.extra_packages %}
 from sqlalchemy_utils import create_database, database_exists, drop_database
-from settings import settings
-
-
-test_database_url = os.environ.get("TEST_DATABASE_URL", "sqlite:///:memory:")
-settings.database_url = test_database_url
 {% endif %}
-mock_data_path = Path(__file__).parent / "mockdata"
 
 {% if "fastapi" in cookiecutter.extra_packages %}
 logging.getLogger("httpx").setLevel(logging.WARNING)
 {% endif %}
+
+mock_data_path = Path(__file__).parent / "mockdata"
+
 
 @pytest.fixture(scope="session")
 def mock_file_content() -> Callable:
@@ -38,12 +35,23 @@ def client():
     # moving it outside will automitcally import settings
     # and break our mechanism use TEST_DATABASE_URL
     from main import app
+
     client = TestClient(app)
     yield client
 {% endif %}
 
 
 {% if "sqlmodel" in cookiecutter.extra_packages %}
+def pytest_configure(config):
+    test_database_url = os.environ.get("TEST_DATABASE_URL", "sqlite:///:memory:")
+    os.environ["DATABASE_URL"] = test_database_url
+    print(f"\npytest_configure: DATABASE_URL set to {test_database_url}")
+
+    test_database_url_async = os.environ.get("TEST_DATABASE_URL_ASYNC")
+    if test_database_url_async:
+        os.environ["DATABASE_URL_ASYNC"] = test_database_url_async
+        print(f"pytest_configure: DATABASE_URL_ASYNC set to {test_database_url_async}")
+
 @pytest.fixture(scope="session")
 def test_db():
     """
@@ -55,9 +63,19 @@ def test_db():
     # this import statement should stay here
     # we must override settings.database_url first
     # before imporing the database module
-    from database import SessionLocal, _is_in_memory_db
+    from helper import is_in_memory_db
+    from database import SessionLocal
+    from settings import settings
 
-    if not _is_in_memory_db(test_database_url):
+    test_database_url = settings.database_url
+    if settings.async_orm and is_in_memory_db(test_database_url):
+        # the data seeded by the sync session cannot be seen by the async session
+        # so all queries will error out on table does not exist
+        raise RuntimeError(
+            "in-memory test database cannot be used when async_orm is enabled"
+        )
+
+    if not is_in_memory_db(test_database_url):
         print(f"\ncreating test database {test_database_url}")
         test_db_created = _create_test_db(test_database_url)
     else:
