@@ -52,6 +52,10 @@ def pytest_configure(config):
         os.environ["DATABASE_URL_ASYNC"] = test_database_url_async
         print(f"pytest_configure: DATABASE_URL_ASYNC set to {test_database_url_async}")
 
+    # set feature flags for testing
+    feature_json_path = Path(__file__).parent / "mockdata/openfeature/flags.flagd.json"
+    os.environ["FEATURE_FLAGS_URL"] = f"file://{feature_json_path.resolve()}"
+
 @pytest.fixture(scope="session")
 def test_db():
     """

@@ -1,0 +1,12 @@
+{
+    "flags": {
+        "{{ cookiecutter.pkg_name }}.useful_svc": {
+            "variants": {
+                "on": true,
+                "off": false
+            },
+            "state": "ENABLED",
+            "defaultVariant": "off"
+        }
+    }
+}

@@ -15,6 +15,8 @@ dependencies = [
     "ulid-py>=1.1.0",
     "python-jose[cryptography]>=3.4.0",
     "pydantic-settings>=2.9.1",
+    "openfeature-sdk>=0.8.1",
+    "openfeature-provider-flagd>=0.2.3",
 {%- endif %}
 {%- if "sqlmodel" in cookiecutter.extra_packages %}
     "sqlmodel>=0.0.24",

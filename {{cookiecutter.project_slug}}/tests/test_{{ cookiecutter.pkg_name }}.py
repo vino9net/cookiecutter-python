@@ -23,6 +23,14 @@ async def test_secret_authenticated(mock_get_jwks_data, client, mock_file_conten
     jwt_token = create_jwt_token(scope="read:data", audience=settings.api_audience)
     response = client.get("/api/secret", headers={"Authorization": "Bearer " + jwt_token})
     assert response.status_code == 200
+
+
+
+async def test_get_something_useful(client):
+    response = client.get("/api/useful")
+    # feature disabled by feature flag will return 403
+    assert response.status_code == 403
+
 {% endif %}
 
 
