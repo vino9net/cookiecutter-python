@@ -47,7 +47,6 @@ if "sqlmodel" not in extra_packages:
     os.unlink(f"{pkg_name}/models.py")
     os.unlink("tests/test_helper.py")
     os.unlink("tests/test_models.py")
-    os.unlink("helper.py")
     os.unlink("alembic.ini")
     os.unlink("database.py")
     shutil.rmtree("migrations")
@@ -55,11 +54,13 @@ if "sqlmodel" not in extra_packages:
 
 if "fastapi" not in extra_packages:
     os.unlink(f"{pkg_name}/api.py")
+    os.unlink("helper.py")
     os.unlink("tests/test_server.py")
     os.unlink("tests/jwt_utils.py")
     os.unlink("settings.py")
     os.unlink("security.py")
     shutil.rmtree("tests/mockdata/jwt")
+    shutil.rmtree("tests/mockdata/openfeature")
 
 
 # create a git repo, everybody needs this, right?

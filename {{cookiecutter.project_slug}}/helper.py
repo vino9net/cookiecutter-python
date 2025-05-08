@@ -1,3 +1,9 @@
+import functools
+import inspect
+
+from fastapi import HTTPException
+
+{%- if "sqlmodel" in cookiecutter.extra_packages %}
 from urllib.parse import urlparse, urlunparse
 
 def is_in_memory_db(db_url: str) -> bool:
@@ -10,6 +16,7 @@ def is_in_memory_db(db_url: str) -> bool:
         "sqlite+aiosqlite://",
         "sqlite+aiosqlite:///:memory:",
     ]
+
 
 def sync2async_database_url(db_url: str) -> str:
     """
@@ -31,3 +38,40 @@ def sync2async_database_url(db_url: str) -> str:
         raise RuntimeError("Unsupported database type {database_url}")
 
     return urlunparse(parsed._replace(scheme=f"{db_type}+{driver}"))
+{% endif %}
+
+
+def feature_gated_api(flag: str):
+    from settings import feature_client, settings
+
+    def decorator_feature_flag(func):
+        @functools.wraps(func)
+        def sync_wrapper(*args, **kwargs):
+            prefix = settings.feature_prefix
+            enabled = feature_client.get_boolean_value(f"{prefix}.{flag}", True)
+            if not enabled:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Feature is disabled",
+                )
+            return func(*args, **kwargs)
+
+        @functools.wraps(func)
+        async def async_wrapper(*args, **kwargs):
+            prefix = settings.feature_prefix
+            enabled = await feature_client.get_boolean_value_async(
+                f"{prefix}.{flag}", True
+            )
+            if not enabled:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Feature is disabled",
+                )
+            return await func(*args, **kwargs)
+
+        if inspect.iscoroutinefunction(func):
+            return async_wrapper
+        else:
+            return sync_wrapper
+
+    return decorator_feature_flag
