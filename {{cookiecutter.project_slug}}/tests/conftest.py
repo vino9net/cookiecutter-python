@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 from typing import Callable
@@ -55,6 +56,13 @@ def pytest_configure(config):
     # set feature flags for testing
     feature_json_path = Path(__file__).parent / "mockdata/openfeature/flags.flagd.json"
     os.environ["FEATURE_FLAGS_URL"] = f"file://{feature_json_path.resolve()}"
+
+   # set JWKS from local file
+    jwks_path = mock_data_path / "jwt/jwks.json"
+    with open(jwks_path, "r") as jwks_file:
+        jwks_data = jwks_file.read()
+        jwks_dict = json.loads(jwks_data)
+        os.environ["JWKS_URL"] = json.dumps(jwks_dict)
 
 @pytest.fixture(scope="session")
 def test_db():

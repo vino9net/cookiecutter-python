@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import Callable, List
 
@@ -15,20 +16,31 @@ security = HTTPBearer()
 _signer_jwks = None
 
 
-# Retrieve public key and algorithm from JWKS endpoint
 async def get_jwks_data() -> dict:
     global _signer_jwks
     if _signer_jwks:
         return _signer_jwks
 
     url = settings.jwks_url
-    logger.info(f"Fetching public key from {url}")
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url)
-        response.raise_for_status()
-        return response.json()
+    if url.startswith("https://"):
+        logger.info(f"Fetching public key from {url}")
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url)
+                response.raise_for_status()
+                _signer_jwks = response.json()
+                return _signer_jwks
+        except httpx.HTTPStatusError as e:
+            logger.info(f"HTTPStatusError: {e} when fetching from {url}")
+    elif url[0] == "{" and url[-1] == "}":
+        # treat it as a json string
+        try:
+            _signer_jwks = json.loads(url)
+            return _signer_jwks
+        except json.JSONDecodeError:
+            logger.info(f"Invalid JSON string {url}")
 
-    raise RuntimeError(f"Unable to fetch jwks from {url}")
+    raise RuntimeError(f"Unable to get jwks from {url}")
 
 
 def get_jwt_verifier(required_scope: str) -> Callable:
