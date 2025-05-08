@@ -32,13 +32,13 @@ async def get_jwks_data() -> dict:
                 return _signer_jwks
         except httpx.HTTPStatusError as e:
             logger.info(f"HTTPStatusError: {e} when fetching from {url}")
-    elif url[0] == "{" and url[-1] == "}":
-        # treat it as a json string
+    else:
+        # Attempt to parse the string as JSON
         try:
             _signer_jwks = json.loads(url)
             return _signer_jwks
         except json.JSONDecodeError:
-            logger.info(f"Invalid JSON string {url}")
+            logger.info(f"Invalid JSON string: {url}")
 
     raise RuntimeError(f"Unable to get jwks from {url}")
 
