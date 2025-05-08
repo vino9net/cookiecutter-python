@@ -1,30 +1,31 @@
+# the branching model is trunk based development. the trunk is main in this case
+#
 # this workflow will be triggered when
 #
 #  1. a pull request is raised
-#  2. a push to 'develop' branch takes place
+#  2. a push to 'main' branch takes place
 #  3. a release tag is created on the repo
 #
 #  whenever the event is trigger, build and test will be performed
-#  a container image will be created and pushed to ghcr.io only when the event trigger is push to develop or tag.
+#  a container image will be created and pushed to ghcr.io only when the event
+#  trigger is push to main.
 #
-#  for push to develop branch, develop-YYYYMMDD-HHMISS-SHA7. the tagging should be sortable by chronological order so that
-#  it can be picked up by CD tools, e.g. FluxCD, for updating the deployment automatically
+#  for push to main branch, main-YYYYMMDD-HHMISS-SHA7. the tagging should be
+#  sortable by chronological order so that it can be picked up by CD tools,
+#  e.g. FluxCD, for updating the deployment automatically
 #
-#  for new tag, the image tag will be same as the repository tag. e.g. v0.1.0
+#  for new tag, the image tag will be same as the repository tag. e.g. 0.1.0
 #
-#  CAVEATS:
-#
-#  does not support copmlete gitflow that uses long running release branches.
 #
 on:
   push:
     branches:
-      - develop
       - main
+    tags:
+      - "rel-*"
 
   pull_request:
     branches:
-      - develop
       - main
 
   workflow_dispatch:
@@ -75,9 +76,9 @@ jobs:
 
   buildx:
     needs: pytest
-    if: startsWith(github.ref, 'refs/heads/develop') || startsWith(github.ref, 'refs/heads/main')
+    # build images only when if pushed into main or a tag is pushed
+    if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/tags/rel-')
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -88,7 +89,7 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=ref,event=tag
-            type=raw,value=develop-{{date 'YYYYMMDD-HHmmss' tz='Asia/Singapore'}}-{{sha}},enable=${{ github.ref == 'refs/heads/develop' }}
+            type=raw,value=main-{{date 'YYYYMMDD-HHmmss' tz='Asia/Singapore'}}-{{sha}},enable=${{ github.ref == 'refs/heads/main' }}
           flavor: |
             latest=false
           labels: |

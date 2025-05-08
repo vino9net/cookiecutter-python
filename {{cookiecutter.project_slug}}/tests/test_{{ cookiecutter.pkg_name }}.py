@@ -17,9 +17,7 @@ async def test_secret_unauthenticated(client):
     assert response.status_code == 403
 
 
-@patch("security.get_jwks_data", new_callable=AsyncMock)
-async def test_secret_authenticated(mock_get_jwks_data, client, mock_file_content):
-    mock_get_jwks_data.return_value = mock_file_content("jwt/jwks.json")
+async def test_secret_authenticated(client):
     jwt_token = create_jwt_token(scope="read:data", audience=settings.api_audience)
     response = client.get("/api/secret", headers={"Authorization": "Bearer " + jwt_token})
     assert response.status_code == 200
