@@ -35,7 +35,7 @@ else:
 
         cd {{ cookiecutter.project_slug }}
         gh repo create {{ cookiecutter.project_slug }} --source=. --public
-        git push -u origin develop
+        git push -u origin main
 
     Please ensure the workflow permission is seting to 'Read and write permissions' to
     enable pushing container images to Github container registry.
@@ -66,7 +66,6 @@ if "fastapi" not in extra_packages:
 # create a git repo, everybody needs this, right?
 print("Initializing git repo...")
 subprocess.call(shlex.split("git init"))
-subprocess.call(shlex.split("git checkout -b develop"))
 subprocess.call(shlex.split("git add .gitignore .dockerignore"))
 subprocess.call(shlex.split("git add *"))
 subprocess.call(
