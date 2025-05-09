@@ -30,12 +30,12 @@ class AppSettings(BaseSettings):
 {% endif %}
 
     # for OpenFeature
-    feature_flags_source: str = "flags.json"
-    feature_prefix: str = ""
+    feature_flags_source: str = "http://localhost:8013"
+    feature_flags_prefix: str = ""
 
 
 settings = AppSettings()
-settings.feature_prefix = settings.feature_prefix or settings.app_name
+settings.feature_flags_prefix = settings.feature_flags_prefix or settings.app_name
 
 {% if "sqlmodel" in cookiecutter.extra_packages %}
 if settings.async_orm and not settings.database_url_async:
