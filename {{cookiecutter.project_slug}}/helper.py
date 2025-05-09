@@ -41,14 +41,14 @@ def sync2async_database_url(db_url: str) -> str:
 {% endif %}
 
 
-def feature_gated_api(flag: str):
+def feature_gated(flag: str, default: bool = True):
     from settings import feature_client, settings
 
     def decorator_feature_flag(func):
         @functools.wraps(func)
         def sync_wrapper(*args, **kwargs):
             prefix = settings.feature_prefix
-            enabled = feature_client.get_boolean_value(f"{prefix}.{flag}", True)
+            enabled = feature_client.get_boolean_value(f"{prefix}.{flag}", default)
             if not enabled:
                 raise HTTPException(
                     status_code=403,

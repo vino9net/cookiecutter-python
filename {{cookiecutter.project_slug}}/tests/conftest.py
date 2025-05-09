@@ -54,8 +54,7 @@ def pytest_configure(config):
         print(f"pytest_configure: DATABASE_URL_ASYNC set to {test_database_url_async}")
 
     # set feature flags for testing
-    feature_json_path = Path(__file__).parent / "mockdata/openfeature/flags.flagd.json"
-    os.environ["FEATURE_FLAGS_URL"] = f"file://{feature_json_path.resolve()}"
+    os.environ["FEATURE_FLAGS_SOURCE"] = f"tests/mockdata/flagd/flags.flagd.json"
 
    # set JWKS from local file
     jwks_path = mock_data_path / "jwt/jwks.json"

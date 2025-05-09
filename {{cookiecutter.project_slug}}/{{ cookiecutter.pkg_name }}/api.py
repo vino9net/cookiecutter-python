@@ -3,7 +3,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from helper import feature_gated_api
+from helper import feature_gated
 from security import get_jwt_verifier
 
 {%- if "sqlmodel" in cookiecutter.extra_packages %}
@@ -57,6 +57,6 @@ async def read_user_async(
 
 
 @router.get("/useful")
-@feature_gated_api("useful_svc")  # this must be after the @router
+@feature_gated("useful_svc")  # this must be after the @router
 async def get_something_useful():
     return {"info": "Isn't this useful?!"}

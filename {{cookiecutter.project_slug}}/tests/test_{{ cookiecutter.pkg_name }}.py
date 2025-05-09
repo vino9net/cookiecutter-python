@@ -1,6 +1,5 @@
 import pytest
 {% if "fastapi" in cookiecutter.extra_packages %}
-from unittest.mock import AsyncMock, patch
 
 
 from settings import settings
