@@ -8,3 +8,5 @@
 !*.py
 !migrations/
 !{{ cookiecutter.pkg_name }}
+!flags*.json
+!logger_config.yaml
