@@ -59,8 +59,9 @@ if "fastapi" not in extra_packages:
     os.unlink("tests/jwt_utils.py")
     os.unlink("settings.py")
     os.unlink("security.py")
+    os.unlink("flags.json")
     shutil.rmtree("tests/mockdata/jwt")
-    shutil.rmtree("tests/mockdata/openfeature")
+    shutil.rmtree("tests/mockdata/flagd")
 
 
 # create a git repo, everybody needs this, right?
@@ -94,16 +95,13 @@ print(
 
     cd ~/{relpath}
 
-    """
-)
-
-print(
-    """
-
     uv sync
 
     # install pre-commit to ensure linting tools are run before code is committed
     uv run pre-commit install
+
+    # reformat generated code
+    uv ruff check --fix .
 
     # activate new venv
     source .venv/bin/activate

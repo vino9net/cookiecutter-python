@@ -531,7 +531,7 @@ wheels = [
 
 [[package]]
 name = "vino-cookiecutter-python"
-version = "0.3.3"
+version = "0.3.4"
 source = { virtual = "." }
 dependencies = [
     { name = "cookiecutter" },
