@@ -25,7 +25,9 @@ async def test_secret_authenticated(client):
 
 async def test_get_something_useful(client):
     response = client.get("/api/useful")
-    # feature disabled by feature flag will return 403
+    # feature flag defaults to true.
+    # flags.json will return false, if it works properly
+    # the test will be successful only if flagd is return the correct data.
     assert response.status_code == 403
 
 {% endif %}
