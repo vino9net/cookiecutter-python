@@ -1,0 +1,29 @@
+# .github/ISSUE_TEMPLATE/issue.yml
+name: Issue
+description: A new issue
+title: " "
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: Feature summary
+      placeholder: Short description of the feature
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Why is this feature needed?
+      placeholder: Describe the use case or user need.
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0
+        - P1
+        - P2
+      default: 3
