@@ -2,6 +2,8 @@
 name: Issue
 description: A new issue
 title: " "
+projects:
+  - vino9net/1
 body:
   - type: input
     id: summary
