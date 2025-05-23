@@ -18,22 +18,7 @@ repos:
     rev: 0.7.5
     hooks:
       - id: uv-lock
-
-  - repo: local
-    hooks:
-      - id: update-requirements-txt
-        name: ensure requirements.txt is up-to-date
-        entry: bash -c 'uv pip compile pyproject.toml -o requirements.txt > /dev/null && git diff --exit-code requirements.txt > /dev/null'
-        language: system
-        files: ^(pyproject\.toml|uv\.lock)$
-        pass_filenames: false
-
-      - id: pyright
-        name: pyright
-        entry: bash -c 'uv run pyright'
-        language: system
-        types: [python]
-        pass_filenames: false
+      - id: uv-export
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.11.8
@@ -42,3 +27,13 @@ repos:
         args: [--fix]
 
       - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: pyright
+        name: pyright
+        entry: bash -c 'uv run pyright'
+        language: system
+        types: [python]
+        pass_filenames: false
+
