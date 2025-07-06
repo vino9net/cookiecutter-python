@@ -11,3 +11,4 @@
 !flags*.json
 !logger_config.yaml
 !pyproject.toml
+!entrypoint.sh
