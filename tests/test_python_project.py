@@ -5,6 +5,7 @@ import os.path
 import random
 import shlex
 import subprocess
+import tarfile
 from typing import Any
 
 import pytest
@@ -84,9 +85,15 @@ def check_project_structure(project_path, context):
     dockerfile_option = context["dockerfile_option"]
     extra_packages = context["extra_packages"]
     use_devcontainer = context["use_devcontainer"]
+    project_type = context["project_type"]
 
     assert project_path.is_dir()
     assert (project_path / ".git/HEAD").is_file()
+
+    if project_type == "lib":
+        assert (project_path / "MANIFEST.in").is_file()
+    else:
+        assert (project_path / "MANIFEST.in").not_exist()
 
     if use_devcontainer == "Yes":
         assert (project_path / ".devcontainer").is_dir()
@@ -106,6 +113,30 @@ def check_project_structure(project_path, context):
 
     if "alembic" in extra_packages:
         assert (project_path / "migrations").is_dir()
+
+
+def run_uv_build(project_path):
+    if not os.path.isdir(project_path):
+        return
+
+    current_path = os.getcwd()
+
+    try:
+        os.chdir(project_path)
+
+        subprocess.call(shlex.split("uv build"))
+
+        assert (project_path / "dist").is_dir()
+        build_files = list(project_path.glob("dist/*.tar.gz"))
+        assert len(build_files) == 1
+
+        tar_path = build_files[0]
+        with tarfile.open(tar_path, "r:gz") as tar:
+            files_in_tar = tar.getnames()
+            test_files = [f for f in files_in_tar if "/tests/" in f]
+            assert not test_files, f"tests folder found in tarball: {test_files}"
+    finally:
+        os.chdir(current_path)
 
 
 def is_valid_test_scenario(context) -> bool:
@@ -195,6 +226,27 @@ def test_generate_and_build(cookies, generator_ctx):
     run_pytest_in_generated_project(result.project_path)
     run_linting_in_generated_project(result.project_path)
     run_precommit_in_generated_project(result.project_path)
+
+
+def test_generate_lib_package(cookies):
+    result = cookies.bake(
+        extra_context={
+            "project_name": "My library Project",
+            "project_type": "lib",
+            "use_devcontainer": "No",
+            "dockerfile_option": "Build container with Github action",
+            "extra_packages": "fastapi sqlmodel alembic",
+        }
+    )
+    assert result.exit_code == 0 and result.exception is None
+    assert result.project_path.is_dir()
+    print(result.project_path)
+
+    check_project_structure(result.project_path, result.context)
+    run_pytest_in_generated_project(result.project_path)
+    run_linting_in_generated_project(result.project_path)
+    run_precommit_in_generated_project(result.project_path)
+    run_uv_build(result.project_path)
 
 
 @pytest.mark.skipif(
