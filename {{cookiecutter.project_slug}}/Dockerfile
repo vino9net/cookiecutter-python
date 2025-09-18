@@ -3,6 +3,9 @@ FROM python:3.12-bookworm AS builder
 LABEL org.opencontainers.image.source=https://github.com/owner/{{ cookiecutter.project_slug }}
 LABEL org.opencontainers.image.description="{{ cookiecutter.project_short_description }}"
 
+# access token for private repos
+ARG PAT
+
 # install packages needed by python packages
 RUN apt-get update \
     && apt-get install --yes --no-install-recommends build-essential \
@@ -11,6 +14,14 @@ RUN apt-get update \
 # create virtualenv and install dependencies
 RUN python -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
+
+RUN if [ -n "$PAT" ]; then \
+        echo "Configuring Git with PAT for private repo access..."; \
+        git config --global url."https://x-access-token:${PAT}@github.com/sloppycoder/".insteadOf "https://github.com/sloppycoder/"; \
+    else \
+        echo "No PAT provided. Skipping Git configuration for private repos."; \
+    fi
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 

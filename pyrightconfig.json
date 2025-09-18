@@ -1,6 +1,7 @@
 {
     "exclude": [
-        ".venv/"
+        ".venv/",
+        "{{cookiecutter.project_slug}}"
     ],
     "include": [
         "*.py",

@@ -32,6 +32,7 @@ dependencies = [
 {%- if cookiecutter.project_type == "lib" %}
 [tool.setuptools.packages.find]
 where = ["."]
+include=["{{ cookiecutter.project_slug }}"]
 
 [build-system]
 requires = ["setuptools>=42", "wheel"]

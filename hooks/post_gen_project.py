@@ -14,6 +14,10 @@ dockerfile_option = context["dockerfile_option"]
 extra_packages = context["extra_packages"]
 pkg_name = context["pkg_name"]
 use_devcontainer = context["use_devcontainer"]
+project_type = context["project_type"]
+
+if project_type != "lib":
+    os.unlink("MANIFEST.in")
 
 if use_devcontainer != "Yes":
     shutil.rmtree(".devcontainer")
