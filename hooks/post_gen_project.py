@@ -15,6 +15,7 @@ extra_packages = context["extra_packages"]
 pkg_name = context["pkg_name"]
 use_devcontainer = context["use_devcontainer"]
 project_type = context["project_type"]
+agent_instruction = context["agent_instruction"]
 
 if project_type != "lib":
     os.unlink("MANIFEST.in")
@@ -67,6 +68,13 @@ if "fastapi" not in extra_packages:
     shutil.rmtree("tests/mockdata/jwt")
     shutil.rmtree("tests/mockdata/flagd")
 
+
+if agent_instruction == "None":
+    os.unlink("CLAUDE.md")
+    shutil.rmtree(".claude")
+elif agent_instruction == "AGENTS.md":
+    os.rename("CLAUDE.md", "AGENTS.md")
+    shutil.rmtree(".claude")
 
 # create a git repo, everybody needs this, right?
 print("Initializing git repo...")

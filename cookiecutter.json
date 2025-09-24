@@ -21,6 +21,11 @@
     "fastapi",
     "fastapi sqlmodel alembic"
   ],
+  "agent_instruction": [
+    "None",
+    "CLAUDE.md",
+    "AGENTS.md"
+  ],
   "version": "0.1.0",
   "_copy_without_render": [
     ".github/workflows/python_build.yaml",
