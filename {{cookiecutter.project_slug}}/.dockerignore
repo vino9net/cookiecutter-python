@@ -4,7 +4,8 @@
 
 # White-list what we need
 
-!requirements*.txt
+!pyproject.toml
+!uv.lock
 !*.py
 !migrations/
 !{{ cookiecutter.pkg_name }}
