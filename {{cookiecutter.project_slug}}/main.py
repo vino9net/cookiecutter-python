@@ -9,6 +9,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from {{ cookiecutter.pkg_name }}.api import router as {{ cookiecutter.pkg_name }}_router
 from settings import settings
+{% else %}
+from http.server import BaseHTTPRequestHandler, HTTPServer
 {% endif %}
 
 # Load the logging configuration
@@ -47,6 +49,11 @@ def ready():
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
 {% else %}
+def run(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
+    server_address = ('', 8000)
+    httpd = server_class(server_address, handler_class)
+    httpd.serve_forever()
+
 if __name__ == "__main__":
-    print("main.py")
+    run()
 {% endif %}
